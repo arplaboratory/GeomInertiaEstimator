@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>inertia_estimator</name>
+    <version>0.0.1</version>
+    <description>Inertia Estimator for Multirotors</description>
+
+    <maintainer email="valentinwueest@gmail.com">Valentin Wueest</maintainer>
+
+    <license>Apache-2.0</license>
+
+    <author>Valentin Wueest</author>
+
+    <buildtool_depend>catkin</buildtool_depend>
+    <build_depend>message_generation</build_depend>
+    <exec_depend>message_runtime</exec_depend>
+
+    <depend>geometry_msgs</depend>
+    <depend>nav_msgs</depend>
+    <depend>sensor_msgs</depend>
+    <depend>roscpp</depend>
+
+    <export>
+    </export>
+</package>

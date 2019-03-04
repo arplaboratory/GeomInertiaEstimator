@@ -1,0 +1,557 @@
+//
+// Academic License - for use in teaching, academic research, and meeting
+// course requirements at degree granting institutions only.  Not for
+// government, commercial, or other organizational use.
+// File: calc_EKF_H_odom_optimized_simple.cpp
+//
+// MATLAB Coder version            : 3.4
+// C/C++ source code generated on  : 26-Feb-2019 22:48:03
+//
+
+// Include Files
+#include "rt_nonfinite.h"
+#include "calc_EKF_H_odom_optimized_simple.h"
+
+// Function Declarations
+static double rt_powd_snf(double u0, double u1);
+
+// Function Definitions
+
+//
+// Arguments    : double u0
+//                double u1
+// Return Type  : double
+//
+static double rt_powd_snf(double u0, double u1)
+{
+  double y;
+  double d0;
+  double d1;
+  if (rtIsNaN(u0) || rtIsNaN(u1)) {
+    y = rtNaN;
+  } else {
+    d0 = std::abs(u0);
+    d1 = std::abs(u1);
+    if (rtIsInf(u1)) {
+      if (d0 == 1.0) {
+        y = 1.0;
+      } else if (d0 > 1.0) {
+        if (u1 > 0.0) {
+          y = rtInf;
+        } else {
+          y = 0.0;
+        }
+      } else if (u1 > 0.0) {
+        y = 0.0;
+      } else {
+        y = rtInf;
+      }
+    } else if (d1 == 0.0) {
+      y = 1.0;
+    } else if (d1 == 1.0) {
+      if (u1 > 0.0) {
+        y = u0;
+      } else {
+        y = 1.0 / u0;
+      }
+    } else if (u1 == 2.0) {
+      y = u0 * u0;
+    } else if ((u1 == 0.5) && (u0 >= 0.0)) {
+      y = std::sqrt(u0);
+    } else if ((u0 < 0.0) && (u1 > std::floor(u1))) {
+      y = rtNaN;
+    } else {
+      y = pow(u0, u1);
+    }
+  }
+
+  return y;
+}
+
+//
+// CALC_EKF_H_ODOM_OPTIMIZED_SIMPLE
+//     HODOM = CALC_EKF_H_ODOM_OPTIMIZED_SIMPLE(QLX,QLY,QLZ,RX,RY,RZ,VX,VY,VZ,OMEGAX,OMEGAY,OMEGAZ,MTOT,ITOTXX,ITOTYY,ITOTZZ,T_GEOMCOGX,T_GEOMCOGY,T_GEOMCOGZ,T_GEOMODOMX,T_GEOMODOMY,T_GEOMODOMZ,T_GEOMIMUX,T_GEOMIMUY,IMUBIASACCX,IMUBIASACCY,IMUBIASACCZ,IMUBIASANGVELX,IMUBIASANGVELY,IMUBIASANGVELZ,MOTOR1,MOTOR2,MOTOR3,MOTOR4,DT,T_GEOMIMUZ,W,L,C,K_F)
+// Arguments    : double qLx
+//                double qLy
+//                double qLz
+//                double rx
+//                double ry
+//                double rz
+//                double vx
+//                double vy
+//                double vz
+//                double Omegax
+//                double Omegay
+//                double Omegaz
+//                double mtot
+//                double Itotxx
+//                double Itotyy
+//                double Itotzz
+//                double t_GeomCogX
+//                double t_GeomCogY
+//                double t_GeomCogZ
+//                double t_GeomOdomX
+//                double t_GeomOdomY
+//                double t_GeomOdomZ
+//                double t_GeomImuX
+//                double t_GeomImuY
+//                double ImuBiasAccX
+//                double ImuBiasAccY
+//                double ImuBiasAccZ
+//                double ImuBiasAngVelX
+//                double ImuBiasAngVelY
+//                double ImuBiasAngVelZ
+//                double motor1
+//                double motor2
+//                double motor3
+//                double motor4
+//                double dt
+//                double t_GeomImuZ
+//                double w
+//                double l
+//                double c
+//                double k_f
+//                double Hodom[90]
+// Return Type  : void
+//
+void calc_EKF_H_odom_optimized_simple(double qLx, double qLy, double qLz, double,
+  double, double, double, double, double, double, double, double, double, double,
+  double, double, double t_GeomCogX, double t_GeomCogY, double t_GeomCogZ,
+  double t_GeomOdomX, double t_GeomOdomY, double t_GeomOdomZ, double, double,
+  double, double, double, double, double, double, double, double, double, double,
+  double, double, double, double, double, double, double Hodom[90])
+{
+  double t2;
+  double t3;
+  double t4;
+  double t5;
+  double t6;
+  double t7;
+  double t8;
+  double t9;
+  double t10;
+  double t11;
+  double t12;
+  double t13;
+  double t14;
+  double t15;
+  double t16;
+  double t17;
+  double t18;
+  double t19;
+  double t20;
+  double t23;
+  double t47;
+  double t25;
+  double t26;
+  double t27;
+  double t28;
+  double t29;
+  double t30;
+  double t31;
+  double t32;
+  double t33;
+  double t34;
+  double t35;
+  double t36;
+  double t37;
+  double t38;
+  double t39;
+  double t40;
+  double t41;
+  double t42;
+  double t43;
+  double t44;
+  double t45;
+  double t46;
+  double t48;
+  double t49;
+  double t50;
+  double t56;
+  double t57;
+  double t58;
+  double t59;
+  double t60;
+  double t61;
+  double t62;
+  double t63;
+  double t64;
+  double t65;
+  double t66;
+  double t67;
+  double t68;
+  double t69;
+  double t70;
+  double t71;
+  double t72;
+  double t73;
+  double t74;
+  double t75;
+  double t76;
+  double t77;
+  double t78;
+  double t79;
+  double t80;
+  double t81;
+  double t82;
+  double t83;
+  double t84;
+  double t85;
+  double b_t10[90];
+  int i0;
+  int i1;
+
+  //     This function was generated by the Symbolic Math Toolbox version 8.0.
+  //     26-Feb-2019 22:06:50
+  t2 = qLy * qLy;
+  t3 = qLz * qLz;
+  t4 = qLx * qLx;
+  t5 = (t2 + t3) + t4;
+  t6 = std::sqrt(t5);
+  t7 = std::cos(t6);
+  t8 = std::sin(t6);
+  t9 = rt_powd_snf(t5, 1.5);
+  t10 = 1.0 / (t5 * t5);
+  t11 = t2 * t2;
+  t12 = t3 * t3;
+  t13 = t6 * 0.5;
+  t14 = std::cos(t13);
+  t15 = std::sin(t13);
+  t16 = 1.0 / rt_powd_snf(t5, 1.5);
+  t17 = t2 * t7;
+  t18 = t3 * t7;
+  t19 = (t4 + t17) + t18;
+  t20 = 1.0 / t5;
+  t13 = qLz * t3 * t14;
+  t5 = qLz * t4 * t14;
+  t23 = qLz * t2 * t14;
+  t47 = qLx * qLy * t6 * t15;
+  t25 = t15 * t16 * (((t13 + t5) + t23) - t47) * 2.0;
+  t26 = qLy * t2 * t14;
+  t27 = qLy * t4 * t14;
+  t28 = qLy * t3 * t14;
+  t29 = qLx * qLz * t6 * t15;
+  t30 = ((t26 + t27) + t28) + t29;
+  t31 = t4 * t4;
+  t32 = t8 * t9 * t_GeomOdomZ * 2.0;
+  t33 = t2 * t4 * t7 * t_GeomOdomZ * 2.0;
+  t34 = qLx * qLy * qLz * t_GeomCogZ * 4.0;
+  t35 = qLx * qLy * qLz * t7 * t_GeomOdomZ * 4.0;
+  t36 = qLx * qLy * qLz * t6 * t8 * t_GeomOdomZ * 2.0;
+  t37 = qLz * t3 * t_GeomCogZ * 2.0;
+  t38 = qLz * t4 * t_GeomOdomZ * 2.0;
+  t39 = qLz * t2 * t_GeomCogZ * 2.0;
+  t40 = qLz * t3 * t7 * t_GeomOdomZ * 2.0;
+  t41 = qLx * qLy * t2 * t7 * t_GeomCogZ * 2.0;
+  t42 = qLx * qLy * t4 * t7 * t_GeomCogZ * 2.0;
+  t43 = qLz * t4 * t7 * t_GeomCogZ * 2.0;
+  t44 = qLz * t2 * t7 * t_GeomOdomZ * 2.0;
+  t45 = qLx * qLy * t3 * t7 * t_GeomCogZ * 2.0;
+  t46 = qLx * qLy * t6 * t8 * t_GeomOdomZ * 2.0;
+  t48 = ((t13 + t5) + t23) + t47;
+  t49 = t4 * t7;
+  t50 = (t2 + t18) + t49;
+  t47 = qLx * t4 * t14;
+  t18 = qLx * t2 * t14;
+  t13 = qLx * t3 * t14;
+  t5 = qLy * qLz * t6 * t15;
+  t14 = t15 * t16 * (((t47 + t18) + t13) - t5) * 2.0;
+  t56 = t8 * t9 * t_GeomOdomY * 2.0;
+  t57 = t3 * t4 * t7 * t_GeomOdomY * 2.0;
+  t58 = qLx * qLy * qLz * t_GeomOdomY * 4.0;
+  t59 = qLx * qLy * qLz * t7 * t_GeomCogY * 4.0;
+  t60 = qLx * qLy * qLz * t6 * t8 * t_GeomCogY * 2.0;
+  t61 = t8 * t9 * t_GeomCogX * 2.0;
+  t62 = t2 * t3 * t7 * t_GeomCogX * 2.0;
+  t63 = qLx * qLy * qLz * t_GeomOdomX * 4.0;
+  t64 = qLx * qLy * qLz * t7 * t_GeomCogX * 4.0;
+  t65 = qLx * qLy * qLz * t6 * t8 * t_GeomCogX * 2.0;
+  t66 = qLx * t4 * t_GeomCogX * 2.0;
+  t67 = qLy * t2 * t_GeomCogY * 2.0;
+  t68 = qLx * t2 * t_GeomOdomX * 2.0;
+  t69 = qLy * t4 * t_GeomOdomY * 2.0;
+  t70 = qLx * t3 * t_GeomCogX * 2.0;
+  t71 = qLy * t3 * t_GeomCogY * 2.0;
+  t72 = qLx * t4 * t7 * t_GeomOdomX * 2.0;
+  t73 = qLy * t2 * t7 * t_GeomOdomY * 2.0;
+  t74 = qLx * t2 * t7 * t_GeomCogX * 2.0;
+  t75 = qLy * t4 * t7 * t_GeomCogY * 2.0;
+  t76 = qLx * t3 * t7 * t_GeomOdomX * 2.0;
+  t77 = qLx * qLz * t3 * t7 * t_GeomOdomY * 2.0;
+  t78 = qLx * qLz * t4 * t7 * t_GeomOdomY * 2.0;
+  t79 = qLy * qLz * t3 * t7 * t_GeomCogX * 2.0;
+  t80 = qLy * qLz * t2 * t7 * t_GeomCogX * 2.0;
+  t81 = qLy * t3 * t7 * t_GeomOdomY * 2.0;
+  t82 = qLy * qLz * t4 * t7 * t_GeomCogX * 2.0;
+  t83 = qLx * qLz * t2 * t7 * t_GeomOdomY * 2.0;
+  t84 = qLx * qLz * t6 * t8 * t_GeomCogY * 2.0;
+  t85 = qLy * qLz * t6 * t8 * t_GeomOdomX * 2.0;
+  t23 = t15 * t16 * (((t26 + t27) + t28) - t29) * 2.0;
+  t5 += (t47 + t18) + t13;
+  t13 = (t3 + t17) + t49;
+  b_t10[0] = t10 *
+    (((((((((((((((((((((((((((((((((((((((((((((((((((((((((((t37 + t38) + t39)
+    + t40) + t41) + t42) + t43) + t44) + t45) + t46) + t67) + t69) + t71) + t73)
+    + t75) + t77) + t78) + t81) + t83) + t84) + qLx * t2 * t_GeomCogX * 4.0) +
+    qLx * t3 * t_GeomCogX * 4.0) - qLx * t2 * t_GeomOdomX * 4.0) - qLx * t3 *
+    t_GeomOdomX * 4.0) - qLy * t4 * t_GeomCogY * 2.0) - qLy * t2 * t_GeomOdomY *
+    2.0) - qLy * t3 * t_GeomOdomY * 2.0) - qLz * t4 * t_GeomCogZ * 2.0) - qLz *
+    t2 * t_GeomOdomZ * 2.0) - qLz * t3 * t_GeomOdomZ * 2.0) - qLx * t2 * t7 *
+    t_GeomCogX * 4.0) - qLx * t3 * t7 * t_GeomCogX * 4.0) - qLx * t8 * t9 *
+    t_GeomCogX) + qLx * t2 * t7 * t_GeomOdomX * 4.0) + qLx * t3 * t7 *
+    t_GeomOdomX * 4.0) + qLx * t8 * t9 * t_GeomOdomX) - qLy * t2 * t7 *
+    t_GeomCogY * 2.0) - qLy * t3 * t7 * t_GeomCogY * 2.0) - qLy * t4 * t7 *
+    t_GeomOdomY * 2.0) - qLz * t2 * t7 * t_GeomCogZ * 2.0) - qLz * t3 * t7 *
+    t_GeomCogZ * 2.0) - qLz * t4 * t7 * t_GeomOdomZ * 2.0) - qLx * qLy * t6 * t8
+                      * t_GeomCogZ * 2.0) - qLx * qLy * t2 * t7 * t_GeomOdomZ *
+                     2.0) - qLx * qLy * t3 * t7 * t_GeomOdomZ * 2.0) - qLx * qLy
+                   * t4 * t7 * t_GeomOdomZ * 2.0) - qLx * qLz * t2 * t7 *
+                  t_GeomCogY * 2.0) - qLx * qLz * t3 * t7 * t_GeomCogY * 2.0) -
+                qLx * qLz * t4 * t7 * t_GeomCogY * 2.0) - qLx * qLz * t6 * t8 *
+               t_GeomOdomY * 2.0) - qLx * t2 * t6 * t8 * t_GeomCogX) - qLx * t3 *
+             t6 * t8 * t_GeomCogX) + qLx * t4 * t6 * t8 * t_GeomCogX) + qLx * t2
+           * t6 * t8 * t_GeomOdomX) + qLx * t3 * t6 * t8 * t_GeomOdomX) - qLx *
+         t4 * t6 * t8 * t_GeomOdomX) + qLy * t4 * t6 * t8 * t_GeomCogY * 2.0) -
+       qLy * t4 * t6 * t8 * t_GeomOdomY * 2.0) + qLz * t4 * t6 * t8 * t_GeomCogZ
+      * 2.0) - qLz * t4 * t6 * t8 * t_GeomOdomZ * 2.0) * -0.5;
+  b_t10[1] = t10 * (((((((((((((((((((((((((((((((((((((((((((((((((t32 + t33) -
+    t34) - t35) - t36) - qLx * t2 * t_GeomCogY * 4.0) + qLx * t2 * t_GeomOdomY *
+    4.0) + qLy * t2 * t_GeomCogX * 2.0) + qLy * t3 * t_GeomCogX * 2.0) - qLy *
+    t4 * t_GeomCogX * 2.0) - qLy * t2 * t_GeomOdomX * 2.0) - qLy * t3 *
+    t_GeomOdomX * 2.0) + qLy * t4 * t_GeomOdomX * 2.0) - t8 * t9 * t_GeomCogZ *
+    2.0) - t7 * t31 * t_GeomCogZ * 2.0) + t7 * t31 * t_GeomOdomZ * 2.0) + qLx *
+    qLy * qLz * t_GeomOdomZ * 4.0) + qLx * t2 * t7 * t_GeomCogY * 4.0) - qLx *
+    t8 * t9 * t_GeomCogY) - qLx * t2 * t7 * t_GeomOdomY * 4.0) + qLx * t8 * t9 *
+    t_GeomOdomY) - qLy * t2 * t7 * t_GeomCogX * 2.0) - qLy * t3 * t7 *
+    t_GeomCogX * 2.0) + qLy * t4 * t7 * t_GeomCogX * 2.0) + qLy * t2 * t7 *
+    t_GeomOdomX * 2.0) + qLy * t3 * t7 * t_GeomOdomX * 2.0) - qLy * t4 * t7 *
+    t_GeomOdomX * 2.0) - t2 * t4 * t7 * t_GeomCogZ * 2.0) - t3 * t4 * t7 *
+    t_GeomCogZ * 2.0) + t4 * t6 * t8 * t_GeomCogZ * 2.0) + t3 * t4 * t7 *
+    t_GeomOdomZ * 2.0) - t4 * t6 * t8 * t_GeomOdomZ * 2.0) + qLx * qLy * qLz *
+    t7 * t_GeomCogZ * 4.0) + qLx * qLz * t2 * t7 * t_GeomCogX * 2.0) + qLx * qLz
+    * t3 * t7 * t_GeomCogX * 2.0) + qLx * qLz * t4 * t7 * t_GeomCogX * 2.0) -
+    qLx * qLz * t6 * t8 * t_GeomCogX * 2.0) - qLx * qLz * t2 * t7 * t_GeomOdomX *
+    2.0) - qLx * qLz * t3 * t7 * t_GeomOdomX * 2.0) - qLx * qLz * t4 * t7 *
+    t_GeomOdomX * 2.0) + qLx * qLz * t6 * t8 * t_GeomOdomX * 2.0) + qLx * t2 *
+    t6 * t8 * t_GeomCogY) - qLx * t3 * t6 * t8 * t_GeomCogY) - qLx * t4 * t6 *
+    t8 * t_GeomCogY) - qLx * t2 * t6 * t8 * t_GeomOdomY) + qLx * t3 * t6 * t8 *
+                        t_GeomOdomY) + qLx * t4 * t6 * t8 * t_GeomOdomY) + qLy *
+                      t4 * t6 * t8 * t_GeomCogX * 2.0) - qLy * t4 * t6 * t8 *
+                     t_GeomOdomX * 2.0) + qLx * qLy * qLz * t6 * t8 * t_GeomCogZ
+                    * 2.0) * -0.5;
+  b_t10[2] = t10 * (((((((((((((((((((((((((((((((((((((((((((((((((t56 + t57) -
+    t58) - t59) - t60) + qLx * t3 * t_GeomCogZ * 4.0) - qLx * t3 * t_GeomOdomZ *
+    4.0) - qLz * t2 * t_GeomCogX * 2.0) - qLz * t3 * t_GeomCogX * 2.0) + qLz *
+    t4 * t_GeomCogX * 2.0) + qLz * t2 * t_GeomOdomX * 2.0) + qLz * t3 *
+    t_GeomOdomX * 2.0) - qLz * t4 * t_GeomOdomX * 2.0) - t8 * t9 * t_GeomCogY *
+    2.0) - t7 * t31 * t_GeomCogY * 2.0) + t7 * t31 * t_GeomOdomY * 2.0) + qLx *
+    qLy * qLz * t_GeomCogY * 4.0) - qLx * t3 * t7 * t_GeomCogZ * 4.0) + qLx * t8
+    * t9 * t_GeomCogZ) + qLx * t3 * t7 * t_GeomOdomZ * 4.0) - qLx * t8 * t9 *
+    t_GeomOdomZ) + qLz * t2 * t7 * t_GeomCogX * 2.0) + qLz * t3 * t7 *
+    t_GeomCogX * 2.0) - qLz * t4 * t7 * t_GeomCogX * 2.0) - qLz * t2 * t7 *
+    t_GeomOdomX * 2.0) - qLz * t3 * t7 * t_GeomOdomX * 2.0) + qLz * t4 * t7 *
+    t_GeomOdomX * 2.0) - t2 * t4 * t7 * t_GeomCogY * 2.0) - t3 * t4 * t7 *
+    t_GeomCogY * 2.0) + t4 * t6 * t8 * t_GeomCogY * 2.0) + t2 * t4 * t7 *
+    t_GeomOdomY * 2.0) - t4 * t6 * t8 * t_GeomOdomY * 2.0) + qLx * qLy * qLz *
+    t7 * t_GeomOdomY * 4.0) + qLx * qLy * t2 * t7 * t_GeomCogX * 2.0) + qLx *
+    qLy * t3 * t7 * t_GeomCogX * 2.0) + qLx * qLy * t4 * t7 * t_GeomCogX * 2.0)
+    - qLx * qLy * t6 * t8 * t_GeomCogX * 2.0) - qLx * qLy * t2 * t7 *
+    t_GeomOdomX * 2.0) - qLx * qLy * t3 * t7 * t_GeomOdomX * 2.0) - qLx * qLy *
+    t4 * t7 * t_GeomOdomX * 2.0) + qLx * qLy * t6 * t8 * t_GeomOdomX * 2.0) +
+    qLx * t2 * t6 * t8 * t_GeomCogZ) - qLx * t3 * t6 * t8 * t_GeomCogZ) + qLx *
+    t4 * t6 * t8 * t_GeomCogZ) - qLx * t2 * t6 * t8 * t_GeomOdomZ) + qLx * t3 *
+                        t6 * t8 * t_GeomOdomZ) - qLx * t4 * t6 * t8 *
+                       t_GeomOdomZ) - qLz * t4 * t6 * t8 * t_GeomCogX * 2.0) +
+                     qLz * t4 * t6 * t8 * t_GeomOdomX * 2.0) + qLx * qLy * qLz *
+                    t6 * t8 * t_GeomOdomY * 2.0) * 0.5;
+  b_t10[3] = t10 * (((((((((((((((((((((((((((((((((((((((((((((((((t32 + t33) +
+    t34) + t35) + t36) + qLx * t2 * t_GeomCogY * 2.0) - qLx * t3 * t_GeomCogY *
+    2.0) - qLx * t4 * t_GeomCogY * 2.0) - qLx * t2 * t_GeomOdomY * 2.0) + qLx *
+    t3 * t_GeomOdomY * 2.0) + qLx * t4 * t_GeomOdomY * 2.0) + qLy * t4 *
+    t_GeomCogX * 4.0) - qLy * t4 * t_GeomOdomX * 4.0) - t8 * t9 * t_GeomCogZ *
+    2.0) - t7 * t11 * t_GeomCogZ * 2.0) + t7 * t11 * t_GeomOdomZ * 2.0) - qLx *
+    qLy * qLz * t_GeomOdomZ * 4.0) - qLx * t2 * t7 * t_GeomCogY * 2.0) + qLx *
+    t3 * t7 * t_GeomCogY * 2.0) + qLx * t4 * t7 * t_GeomCogY * 2.0) + qLx * t2 *
+    t7 * t_GeomOdomY * 2.0) - qLx * t3 * t7 * t_GeomOdomY * 2.0) - qLx * t4 * t7
+    * t_GeomOdomY * 2.0) - qLy * t4 * t7 * t_GeomCogX * 4.0) + qLy * t8 * t9 *
+    t_GeomCogX) + qLy * t4 * t7 * t_GeomOdomX * 4.0) - qLy * t8 * t9 *
+    t_GeomOdomX) - t2 * t3 * t7 * t_GeomCogZ * 2.0) - t2 * t4 * t7 * t_GeomCogZ *
+    2.0) + t2 * t6 * t8 * t_GeomCogZ * 2.0) + t2 * t3 * t7 * t_GeomOdomZ * 2.0)
+    - t2 * t6 * t8 * t_GeomOdomZ * 2.0) - qLx * qLy * qLz * t7 * t_GeomCogZ *
+    4.0) + qLy * qLz * t2 * t7 * t_GeomCogY * 2.0) + qLy * qLz * t3 * t7 *
+    t_GeomCogY * 2.0) + qLy * qLz * t4 * t7 * t_GeomCogY * 2.0) - qLy * qLz * t6
+    * t8 * t_GeomCogY * 2.0) - qLy * qLz * t2 * t7 * t_GeomOdomY * 2.0) - qLy *
+    qLz * t3 * t7 * t_GeomOdomY * 2.0) - qLy * qLz * t4 * t7 * t_GeomOdomY * 2.0)
+    + qLy * qLz * t6 * t8 * t_GeomOdomY * 2.0) - qLx * t2 * t6 * t8 * t_GeomCogY
+    * 2.0) + qLx * t2 * t6 * t8 * t_GeomOdomY * 2.0) + qLy * t2 * t6 * t8 *
+    t_GeomCogX) + qLy * t3 * t6 * t8 * t_GeomCogX) - qLy * t4 * t6 * t8 *
+                        t_GeomCogX) - qLy * t2 * t6 * t8 * t_GeomOdomX) - qLy *
+                      t3 * t6 * t8 * t_GeomOdomX) + qLy * t4 * t6 * t8 *
+                     t_GeomOdomX) - qLx * qLy * qLz * t6 * t8 * t_GeomCogZ * 2.0)
+    * 0.5;
+  b_t10[4] = t10 *
+    (((((((((((((((((((((((((((((((((((((((((((((((((((((((((((t37 - t38) - t39)
+    + t40) - t41) - t42) - t43) - t44) - t45) - t46) + t66) + t68) + t70) + t72)
+    + t74) + t76) + t79) + t80) + t82) + t85) - qLx * t2 * t_GeomCogX * 2.0) -
+    qLx * t3 * t_GeomOdomX * 2.0) - qLx * t4 * t_GeomOdomX * 2.0) + qLy * t3 *
+    t_GeomCogY * 4.0) + qLy * t4 * t_GeomCogY * 4.0) - qLy * t3 * t_GeomOdomY *
+    4.0) - qLy * t4 * t_GeomOdomY * 4.0) + qLz * t4 * t_GeomCogZ * 2.0) + qLz *
+    t2 * t_GeomOdomZ * 2.0) - qLz * t3 * t_GeomOdomZ * 2.0) - qLx * t3 * t7 *
+    t_GeomCogX * 2.0) - qLx * t4 * t7 * t_GeomCogX * 2.0) - qLx * t2 * t7 *
+    t_GeomOdomX * 2.0) - qLy * t3 * t7 * t_GeomCogY * 4.0) - qLy * t4 * t7 *
+    t_GeomCogY * 4.0) - qLy * t8 * t9 * t_GeomCogY) + qLy * t3 * t7 *
+    t_GeomOdomY * 4.0) + qLy * t4 * t7 * t_GeomOdomY * 4.0) + qLy * t8 * t9 *
+    t_GeomOdomY) + qLz * t2 * t7 * t_GeomCogZ * 2.0) - qLz * t3 * t7 *
+    t_GeomCogZ * 2.0) + qLz * t4 * t7 * t_GeomOdomZ * 2.0) + qLx * qLy * t6 * t8
+                      * t_GeomCogZ * 2.0) + qLx * qLy * t2 * t7 * t_GeomOdomZ *
+                     2.0) + qLx * qLy * t3 * t7 * t_GeomOdomZ * 2.0) + qLx * qLy
+                   * t4 * t7 * t_GeomOdomZ * 2.0) - qLy * qLz * t6 * t8 *
+                  t_GeomCogX * 2.0) - qLy * qLz * t2 * t7 * t_GeomOdomX * 2.0) -
+                qLy * qLz * t3 * t7 * t_GeomOdomX * 2.0) - qLy * qLz * t4 * t7 *
+               t_GeomOdomX * 2.0) + qLx * t2 * t6 * t8 * t_GeomCogX * 2.0) - qLx
+             * t2 * t6 * t8 * t_GeomOdomX * 2.0) + qLy * t2 * t6 * t8 *
+            t_GeomCogY) - qLy * t3 * t6 * t8 * t_GeomCogY) - qLy * t4 * t6 * t8 *
+          t_GeomCogY) - qLy * t2 * t6 * t8 * t_GeomOdomY) + qLy * t3 * t6 * t8 *
+        t_GeomOdomY) + qLy * t4 * t6 * t8 * t_GeomOdomY) + qLz * t2 * t6 * t8 *
+      t_GeomCogZ * 2.0) - qLz * t2 * t6 * t8 * t_GeomOdomZ * 2.0) * -0.5;
+  b_t10[5] = t10 * (((((((((((((((((((((((((((((((((((((((((((((((((t61 + t62) -
+    t63) - t64) - t65) + qLy * t3 * t_GeomCogZ * 4.0) - qLy * t3 * t_GeomOdomZ *
+    4.0) + qLz * t2 * t_GeomCogY * 2.0) - qLz * t3 * t_GeomCogY * 2.0) - qLz *
+    t4 * t_GeomCogY * 2.0) - qLz * t2 * t_GeomOdomY * 2.0) + qLz * t3 *
+    t_GeomOdomY * 2.0) + qLz * t4 * t_GeomOdomY * 2.0) + t7 * t11 * t_GeomCogX *
+    2.0) - t8 * t9 * t_GeomOdomX * 2.0) - t7 * t11 * t_GeomOdomX * 2.0) + qLx *
+    qLy * qLz * t_GeomCogX * 4.0) - qLy * t3 * t7 * t_GeomCogZ * 4.0) + qLy * t8
+    * t9 * t_GeomCogZ) + qLy * t3 * t7 * t_GeomOdomZ * 4.0) - qLy * t8 * t9 *
+    t_GeomOdomZ) - qLz * t2 * t7 * t_GeomCogY * 2.0) + qLz * t3 * t7 *
+    t_GeomCogY * 2.0) + qLz * t4 * t7 * t_GeomCogY * 2.0) + qLz * t2 * t7 *
+    t_GeomOdomY * 2.0) - qLz * t3 * t7 * t_GeomOdomY * 2.0) - qLz * t4 * t7 *
+    t_GeomOdomY * 2.0) + t2 * t4 * t7 * t_GeomCogX * 2.0) - t2 * t6 * t8 *
+    t_GeomCogX * 2.0) - t2 * t3 * t7 * t_GeomOdomX * 2.0) - t2 * t4 * t7 *
+    t_GeomOdomX * 2.0) + t2 * t6 * t8 * t_GeomOdomX * 2.0) + qLx * qLy * qLz *
+    t7 * t_GeomOdomX * 4.0) - qLx * qLy * t2 * t7 * t_GeomCogY * 2.0) - qLx *
+    qLy * t3 * t7 * t_GeomCogY * 2.0) - qLx * qLy * t4 * t7 * t_GeomCogY * 2.0)
+    + qLx * qLy * t6 * t8 * t_GeomCogY * 2.0) + qLx * qLy * t2 * t7 *
+    t_GeomOdomY * 2.0) + qLx * qLy * t3 * t7 * t_GeomOdomY * 2.0) + qLx * qLy *
+    t4 * t7 * t_GeomOdomY * 2.0) - qLx * qLy * t6 * t8 * t_GeomOdomY * 2.0) +
+    qLy * t2 * t6 * t8 * t_GeomCogZ) - qLy * t3 * t6 * t8 * t_GeomCogZ) + qLy *
+    t4 * t6 * t8 * t_GeomCogZ) - qLy * t2 * t6 * t8 * t_GeomOdomZ) + qLy * t3 *
+                        t6 * t8 * t_GeomOdomZ) - qLy * t4 * t6 * t8 *
+                       t_GeomOdomZ) - qLz * t2 * t6 * t8 * t_GeomCogY * 2.0) +
+                     qLz * t2 * t6 * t8 * t_GeomOdomY * 2.0) + qLx * qLy * qLz *
+                    t6 * t8 * t_GeomOdomX * 2.0) * 0.5;
+  b_t10[6] = t10 * (((((((((((((((((((((((((((((((((((((((((((((((((t56 + t57) +
+    t58) + t59) + t60) + qLx * t2 * t_GeomCogZ * 2.0) - qLx * t3 * t_GeomCogZ *
+    2.0) + qLx * t4 * t_GeomCogZ * 2.0) - qLx * t2 * t_GeomOdomZ * 2.0) + qLx *
+    t3 * t_GeomOdomZ * 2.0) - qLx * t4 * t_GeomOdomZ * 2.0) - qLz * t4 *
+    t_GeomCogX * 4.0) + qLz * t4 * t_GeomOdomX * 4.0) - t8 * t9 * t_GeomCogY *
+    2.0) - t7 * t12 * t_GeomCogY * 2.0) + t7 * t12 * t_GeomOdomY * 2.0) - qLx *
+    qLy * qLz * t_GeomCogY * 4.0) - qLx * t2 * t7 * t_GeomCogZ * 2.0) + qLx * t3
+    * t7 * t_GeomCogZ * 2.0) - qLx * t4 * t7 * t_GeomCogZ * 2.0) + qLx * t2 * t7
+    * t_GeomOdomZ * 2.0) - qLx * t3 * t7 * t_GeomOdomZ * 2.0) + qLx * t4 * t7 *
+    t_GeomOdomZ * 2.0) + qLz * t4 * t7 * t_GeomCogX * 4.0) - qLz * t8 * t9 *
+    t_GeomCogX) - qLz * t4 * t7 * t_GeomOdomX * 4.0) + qLz * t8 * t9 *
+    t_GeomOdomX) - t2 * t3 * t7 * t_GeomCogY * 2.0) - t3 * t4 * t7 * t_GeomCogY *
+    2.0) + t3 * t6 * t8 * t_GeomCogY * 2.0) + t2 * t3 * t7 * t_GeomOdomY * 2.0)
+    - t3 * t6 * t8 * t_GeomOdomY * 2.0) - qLx * qLy * qLz * t7 * t_GeomOdomY *
+    4.0) + qLy * qLz * t2 * t7 * t_GeomCogZ * 2.0) + qLy * qLz * t3 * t7 *
+    t_GeomCogZ * 2.0) + qLy * qLz * t4 * t7 * t_GeomCogZ * 2.0) - qLy * qLz * t6
+    * t8 * t_GeomCogZ * 2.0) - qLy * qLz * t2 * t7 * t_GeomOdomZ * 2.0) - qLy *
+    qLz * t3 * t7 * t_GeomOdomZ * 2.0) - qLy * qLz * t4 * t7 * t_GeomOdomZ * 2.0)
+    + qLy * qLz * t6 * t8 * t_GeomOdomZ * 2.0) + qLx * t3 * t6 * t8 * t_GeomCogZ
+    * 2.0) - qLx * t3 * t6 * t8 * t_GeomOdomZ * 2.0) - qLz * t2 * t6 * t8 *
+    t_GeomCogX) - qLz * t3 * t6 * t8 * t_GeomCogX) + qLz * t4 * t6 * t8 *
+                        t_GeomCogX) + qLz * t2 * t6 * t8 * t_GeomOdomX) + qLz *
+                      t3 * t6 * t8 * t_GeomOdomX) - qLz * t4 * t6 * t8 *
+                     t_GeomOdomX) - qLx * qLy * qLz * t6 * t8 * t_GeomOdomY *
+                    2.0) * -0.5;
+  b_t10[7] = t10 * (((((((((((((((((((((((((((((((((((((((((((((((((t61 + t62) +
+    t63) + t64) + t65) + qLy * t2 * t_GeomCogZ * 2.0) - qLy * t3 * t_GeomCogZ *
+    2.0) + qLy * t4 * t_GeomCogZ * 2.0) - qLy * t2 * t_GeomOdomZ * 2.0) + qLy *
+    t3 * t_GeomOdomZ * 2.0) - qLy * t4 * t_GeomOdomZ * 2.0) - qLz * t2 *
+    t_GeomCogY * 4.0) + qLz * t2 * t_GeomOdomY * 4.0) + t7 * t12 * t_GeomCogX *
+    2.0) - t8 * t9 * t_GeomOdomX * 2.0) - t7 * t12 * t_GeomOdomX * 2.0) - qLx *
+    qLy * qLz * t_GeomCogX * 4.0) - qLy * t2 * t7 * t_GeomCogZ * 2.0) + qLy * t3
+    * t7 * t_GeomCogZ * 2.0) - qLy * t4 * t7 * t_GeomCogZ * 2.0) + qLy * t2 * t7
+    * t_GeomOdomZ * 2.0) - qLy * t3 * t7 * t_GeomOdomZ * 2.0) + qLy * t4 * t7 *
+    t_GeomOdomZ * 2.0) + qLz * t2 * t7 * t_GeomCogY * 4.0) - qLz * t8 * t9 *
+    t_GeomCogY) - qLz * t2 * t7 * t_GeomOdomY * 4.0) + qLz * t8 * t9 *
+    t_GeomOdomY) + t3 * t4 * t7 * t_GeomCogX * 2.0) - t3 * t6 * t8 * t_GeomCogX *
+    2.0) - t2 * t3 * t7 * t_GeomOdomX * 2.0) - t3 * t4 * t7 * t_GeomOdomX * 2.0)
+    + t3 * t6 * t8 * t_GeomOdomX * 2.0) - qLx * qLy * qLz * t7 * t_GeomOdomX *
+    4.0) - qLx * qLz * t2 * t7 * t_GeomCogZ * 2.0) - qLx * qLz * t3 * t7 *
+    t_GeomCogZ * 2.0) - qLx * qLz * t4 * t7 * t_GeomCogZ * 2.0) + qLx * qLz * t6
+    * t8 * t_GeomCogZ * 2.0) + qLx * qLz * t2 * t7 * t_GeomOdomZ * 2.0) + qLx *
+    qLz * t3 * t7 * t_GeomOdomZ * 2.0) + qLx * qLz * t4 * t7 * t_GeomOdomZ * 2.0)
+    - qLx * qLz * t6 * t8 * t_GeomOdomZ * 2.0) + qLy * t3 * t6 * t8 * t_GeomCogZ
+    * 2.0) - qLy * t3 * t6 * t8 * t_GeomOdomZ * 2.0) + qLz * t2 * t6 * t8 *
+    t_GeomCogY) - qLz * t3 * t6 * t8 * t_GeomCogY) - qLz * t4 * t6 * t8 *
+                        t_GeomCogY) - qLz * t2 * t6 * t8 * t_GeomOdomY) + qLz *
+                      t3 * t6 * t8 * t_GeomOdomY) + qLz * t4 * t6 * t8 *
+                     t_GeomOdomY) - qLx * qLy * qLz * t6 * t8 * t_GeomOdomX *
+                    2.0) * -0.5;
+  b_t10[8] = t10 *
+    (((((((((((((((((((((((((((((((((((((((((((((((((((((((((((t66 + t67) - t68)
+    - t69) - t70) - t71) + t72) + t73) - t74) - t75) - t76) - t77) - t78) - t79)
+    - t80) - t81) - t82) - t83) - t84) - t85) + qLx * t2 * t_GeomCogX * 2.0) +
+    qLx * t3 * t_GeomOdomX * 2.0) - qLx * t4 * t_GeomOdomX * 2.0) + qLy * t4 *
+    t_GeomCogY * 2.0) - qLy * t2 * t_GeomOdomY * 2.0) + qLy * t3 * t_GeomOdomY *
+    2.0) + qLz * t2 * t_GeomCogZ * 4.0) + qLz * t4 * t_GeomCogZ * 4.0) - qLz *
+    t2 * t_GeomOdomZ * 4.0) - qLz * t4 * t_GeomOdomZ * 4.0) + qLx * t3 * t7 *
+    t_GeomCogX * 2.0) - qLx * t4 * t7 * t_GeomCogX * 2.0) + qLx * t2 * t7 *
+    t_GeomOdomX * 2.0) - qLy * t2 * t7 * t_GeomCogY * 2.0) + qLy * t3 * t7 *
+    t_GeomCogY * 2.0) + qLy * t4 * t7 * t_GeomOdomY * 2.0) - qLz * t2 * t7 *
+    t_GeomCogZ * 4.0) - qLz * t4 * t7 * t_GeomCogZ * 4.0) - qLz * t8 * t9 *
+    t_GeomCogZ) + qLz * t2 * t7 * t_GeomOdomZ * 4.0) + qLz * t4 * t7 *
+    t_GeomOdomZ * 4.0) + qLz * t8 * t9 * t_GeomOdomZ) + qLx * qLz * t2 * t7 *
+                      t_GeomCogY * 2.0) + qLx * qLz * t3 * t7 * t_GeomCogY * 2.0)
+                    + qLx * qLz * t4 * t7 * t_GeomCogY * 2.0) + qLx * qLz * t6 *
+                   t8 * t_GeomOdomY * 2.0) + qLy * qLz * t6 * t8 * t_GeomCogX *
+                  2.0) + qLy * qLz * t2 * t7 * t_GeomOdomX * 2.0) + qLy * qLz *
+                t3 * t7 * t_GeomOdomX * 2.0) + qLy * qLz * t4 * t7 * t_GeomOdomX
+               * 2.0) + qLx * t3 * t6 * t8 * t_GeomCogX * 2.0) - qLx * t3 * t6 *
+             t8 * t_GeomOdomX * 2.0) + qLy * t3 * t6 * t8 * t_GeomCogY * 2.0) -
+           qLy * t3 * t6 * t8 * t_GeomOdomY * 2.0) - qLz * t2 * t6 * t8 *
+          t_GeomCogZ) + qLz * t3 * t6 * t8 * t_GeomCogZ) - qLz * t4 * t6 * t8 *
+        t_GeomCogZ) + qLz * t2 * t6 * t8 * t_GeomOdomZ) - qLz * t3 * t6 * t8 *
+      t_GeomOdomZ) + qLz * t4 * t6 * t8 * t_GeomOdomZ) * -0.5;
+  b_t10[9] = 1.0;
+  b_t10[10] = 0.0;
+  b_t10[11] = 0.0;
+  b_t10[12] = 0.0;
+  b_t10[13] = 1.0;
+  b_t10[14] = 0.0;
+  b_t10[15] = 0.0;
+  b_t10[16] = 0.0;
+  b_t10[17] = 1.0;
+  memset(&b_t10[18], 0, 30U * sizeof(double));
+  b_t10[48] = -t19 * t20;
+  b_t10[49] = t15 * t16 * t48 * -2.0;
+  b_t10[50] = t23;
+  b_t10[51] = t25;
+  b_t10[52] = -t20 * t50;
+  b_t10[53] = t15 * t16 * t5 * -2.0;
+  b_t10[54] = t15 * t16 * t30 * -2.0;
+  b_t10[55] = t14;
+  b_t10[56] = -t20 * t13;
+  b_t10[57] = t19 * t20;
+  b_t10[58] = t15 * t16 * t48 * 2.0;
+  b_t10[59] = -t23;
+  b_t10[60] = -t25;
+  b_t10[61] = t20 * t50;
+  b_t10[62] = t15 * t16 * t5 * 2.0;
+  b_t10[63] = t15 * t16 * t30 * 2.0;
+  b_t10[64] = -t14;
+  b_t10[65] = t20 * t13;
+  memset(&b_t10[66], 0, 24U * sizeof(double));
+  for (i0 = 0; i0 < 30; i0++) {
+    for (i1 = 0; i1 < 3; i1++) {
+      Hodom[i1 + 3 * i0] = b_t10[i1 + 3 * i0];
+    }
+  }
+}
+
+//
+// File trailer for calc_EKF_H_odom_optimized_simple.cpp
+//
+// [EOF]
+//

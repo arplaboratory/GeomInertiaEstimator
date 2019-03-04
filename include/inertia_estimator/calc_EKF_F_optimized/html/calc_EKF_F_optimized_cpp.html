@@ -1,0 +1,792 @@
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>RTW Report - calc_EKF_F_optimized.cpp</title>
+<script language="JavaScript" type="text/javascript" src="rtwreport_utils.js"></script>
+<script src="resources/eml_report_loadable_data.js"></script>
+</head>
+<body bgcolor="#eeeeee" onload="try {if (top) { if (top.rtwFileOnLoad) top.rtwFileOnLoad(window.document); else local_onload();}} catch(err) {};">
+<p>
+<table border="0" cellspacing="0" cellpadding="6" width="100%%" height="100%%"><tr><td width="100%%" valign="top" bgcolor="#ffffff">
+<h4>File: <a href="../calc_EKF_F_optimized.cpp" target="rtwreport_document_frame" id="linkToText_plain">calc_EKF_F_optimized.cpp</a></h4>
+<pre id="RTWcode">
+<a name="1"><font color="#888888 "><i>    1   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="2"><font color="#888888 "><i>    2   </i></font></a><font color="#117755"><i>// Academic License - for use in teaching, academic research, and meeting</i></font>
+<a name="3"><font color="#888888 "><i>    3   </i></font></a><font color="#117755"><i>// course requirements at degree granting institutions only.  Not for</i></font>
+<a name="4"><font color="#888888 "><i>    4   </i></font></a><font color="#117755"><i>// government, commercial, or other organizational use.</i></font>
+<a name="5"><font color="#888888 "><i>    5   </i></font></a><font color="#117755"><i>// File: calc_EKF_F_optimized.cpp</i></font>
+<a name="6"><font color="#888888 "><i>    6   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="7"><font color="#888888 "><i>    7   </i></font></a><font color="#117755"><i>// MATLAB Coder version            : 3.4</i></font>
+<a name="8"><font color="#888888 "><i>    8   </i></font></a><font color="#117755"><i>// C/C++ source code generated on  : 26-Feb-2019 22:17:41</i></font>
+<a name="9"><font color="#888888 "><i>    9   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="10"><font color="#888888 "><i>   10   </i></font></a>
+<a name="11"><font color="#888888 "><i>   11   </i></font></a><font color="#117755"><i>// Include Files</i></font>
+<a name="12"><font color="#888888 "><i>   12   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;rt_nonfinite.h&quot;</font>
+<a name="13"><font color="#888888 "><i>   13   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;calc_EKF_F_optimized.h&quot;</font>
+<a name="14"><font color="#888888 "><i>   14   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;sign.h&quot;</font>
+<a name="15"><font color="#888888 "><i>   15   </i></font></a><font color="#992211">#</font><font color="#992211"><b>include</b></font> <font color="#992211">&quot;sqrt.h&quot;</font>
+<a name="16"><font color="#888888 "><i>   16   </i></font></a>
+<a name="17"><font color="#888888 "><i>   17   </i></font></a><font color="#117755"><i>// Function Declarations</i></font>
+<a name="18"><font color="#888888 "><i>   18   </i></font></a><font color="#112266"><b>static</b></font> <font color="#112266"><b>double</b></font> <a href="#fcn_rt_atan2d_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_atan2d_snf');" target="_self"><font color="#1122aa">rt_atan2d_snf</font></a>(<font color="#112266"><b>double</b></font> u0, <font color="#112266"><b>double</b></font> u1);
+<a name="19"><font color="#888888 "><i>   19   </i></font></a><font color="#112266"><b>static</b></font> <font color="#112266"><b>double</b></font> <a href="#fcn_rt_powd_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_powd_snf');" target="_self"><font color="#1122aa">rt_powd_snf</font></a>(<font color="#112266"><b>double</b></font> u0, <font color="#112266"><b>double</b></font> u1);
+<a name="20"><font color="#888888 "><i>   20   </i></font></a>
+<a name="21"><font color="#888888 "><i>   21   </i></font></a><font color="#117755"><i>// Function Definitions</i></font>
+<a name="22"><font color="#888888 "><i>   22   </i></font></a>
+<a name="23"><font color="#888888 "><i>   23   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="24"><font color="#888888 "><i>   24   </i></font></a><font color="#117755"><i>// Arguments    : double u0</i></font>
+<a name="25"><font color="#888888 "><i>   25   </i></font></a><font color="#117755"><i>//                double u1</i></font>
+<a name="26"><font color="#888888 "><i>   26   </i></font></a><font color="#117755"><i>// Return Type  : double</i></font>
+<a name="27"><font color="#888888 "><i>   27   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="28"><font color="#888888 "><i>   28   </i></font></a><font color="#112266"><b>static</b></font> <font color="#112266"><b>double</b></font> <a name="fcn_rt_atan2d_snf">rt_atan2d_snf</a>(<font color="#112266"><b>double</b></font> u0, <font color="#112266"><b>double</b></font> u1)
+<a name="29"><font color="#888888 "><i>   29   </i></font></a><b>{</b>
+<a name="30"><font color="#888888 "><i>   30   </i></font></a>  <font color="#112266"><b>double</b></font> y;
+<a name="31"><font color="#888888 "><i>   31   </i></font></a>  <font color="#112266"><b>int</b></font> b_u0;
+<a name="32"><font color="#888888 "><i>   32   </i></font></a>  <font color="#112266"><b>int</b></font> b_u1;
+<a name="33"><font color="#888888 "><i>   33   </i></font></a>  <font color="#112266"><b>if</b></font> (<a href="rt_nonfinite_cpp.html#fcn_rtIsNaN" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rtIsNaN');" target="_self"><font color="#1122aa">rtIsNaN</font></a>(u0) || <a href="rt_nonfinite_cpp.html#fcn_rtIsNaN" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rtIsNaN');" target="_self"><font color="#1122aa">rtIsNaN</font></a>(u1)) <b>{</b>
+<a name="34"><font color="#888888 "><i>   34   </i></font></a>    y = <a href="rt_nonfinite_cpp.html#var_rtNaN" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_rtNaN');" target="_self"><font color="#1122aa">rtNaN</font></a>;
+<a name="35"><font color="#888888 "><i>   35   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (<a href="rt_nonfinite_cpp.html#fcn_rtIsInf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rtIsInf');" target="_self"><font color="#1122aa">rtIsInf</font></a>(u0) &amp;&amp; <a href="rt_nonfinite_cpp.html#fcn_rtIsInf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rtIsInf');" target="_self"><font color="#1122aa">rtIsInf</font></a>(u1)) <b>{</b>
+<a name="36"><font color="#888888 "><i>   36   </i></font></a>    <font color="#112266"><b>if</b></font> (u0 &gt; 0.0) <b>{</b>
+<a name="37"><font color="#888888 "><i>   37   </i></font></a>      b_u0 = 1;
+<a name="38"><font color="#888888 "><i>   38   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="39"><font color="#888888 "><i>   39   </i></font></a>      b_u0 = -1;
+<a name="40"><font color="#888888 "><i>   40   </i></font></a>    <b>}</b>
+<a name="41"><font color="#888888 "><i>   41   </i></font></a>
+<a name="42"><font color="#888888 "><i>   42   </i></font></a>    <font color="#112266"><b>if</b></font> (u1 &gt; 0.0) <b>{</b>
+<a name="43"><font color="#888888 "><i>   43   </i></font></a>      b_u1 = 1;
+<a name="44"><font color="#888888 "><i>   44   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="45"><font color="#888888 "><i>   45   </i></font></a>      b_u1 = -1;
+<a name="46"><font color="#888888 "><i>   46   </i></font></a>    <b>}</b>
+<a name="47"><font color="#888888 "><i>   47   </i></font></a>
+<a name="48"><font color="#888888 "><i>   48   </i></font></a>    y = atan2((<font color="#112266"><b>double</b></font>)b_u0, (<font color="#112266"><b>double</b></font>)b_u1);
+<a name="49"><font color="#888888 "><i>   49   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (u1 == 0.0) <b>{</b>
+<a name="50"><font color="#888888 "><i>   50   </i></font></a>    <font color="#112266"><b>if</b></font> (u0 &gt; 0.0) <b>{</b>
+<a name="51"><font color="#888888 "><i>   51   </i></font></a>      y = RT_PI / 2.0;
+<a name="52"><font color="#888888 "><i>   52   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (u0 &lt; 0.0) <b>{</b>
+<a name="53"><font color="#888888 "><i>   53   </i></font></a>      y = -(RT_PI / 2.0);
+<a name="54"><font color="#888888 "><i>   54   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="55"><font color="#888888 "><i>   55   </i></font></a>      y = 0.0;
+<a name="56"><font color="#888888 "><i>   56   </i></font></a>    <b>}</b>
+<a name="57"><font color="#888888 "><i>   57   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="58"><font color="#888888 "><i>   58   </i></font></a>    y = atan2(u0, u1);
+<a name="59"><font color="#888888 "><i>   59   </i></font></a>  <b>}</b>
+<a name="60"><font color="#888888 "><i>   60   </i></font></a>
+<a name="61"><font color="#888888 "><i>   61   </i></font></a>  <font color="#112266"><b>return</b></font> y;
+<a name="62"><font color="#888888 "><i>   62   </i></font></a><b>}</b>
+<a name="63"><font color="#888888 "><i>   63   </i></font></a>
+<a name="64"><font color="#888888 "><i>   64   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="65"><font color="#888888 "><i>   65   </i></font></a><font color="#117755"><i>// Arguments    : double u0</i></font>
+<a name="66"><font color="#888888 "><i>   66   </i></font></a><font color="#117755"><i>//                double u1</i></font>
+<a name="67"><font color="#888888 "><i>   67   </i></font></a><font color="#117755"><i>// Return Type  : double</i></font>
+<a name="68"><font color="#888888 "><i>   68   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="69"><font color="#888888 "><i>   69   </i></font></a><font color="#112266"><b>static</b></font> <font color="#112266"><b>double</b></font> <a name="fcn_rt_powd_snf">rt_powd_snf</a>(<font color="#112266"><b>double</b></font> u0, <font color="#112266"><b>double</b></font> u1)
+<a name="70"><font color="#888888 "><i>   70   </i></font></a><b>{</b>
+<a name="71"><font color="#888888 "><i>   71   </i></font></a>  <font color="#112266"><b>double</b></font> y;
+<a name="72"><font color="#888888 "><i>   72   </i></font></a>  <font color="#112266"><b>double</b></font> d0;
+<a name="73"><font color="#888888 "><i>   73   </i></font></a>  <font color="#112266"><b>double</b></font> d1;
+<a name="74"><font color="#888888 "><i>   74   </i></font></a>  <font color="#112266"><b>if</b></font> (<a href="rt_nonfinite_cpp.html#fcn_rtIsNaN" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rtIsNaN');" target="_self"><font color="#1122aa">rtIsNaN</font></a>(u0) || <a href="rt_nonfinite_cpp.html#fcn_rtIsNaN" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rtIsNaN');" target="_self"><font color="#1122aa">rtIsNaN</font></a>(u1)) <b>{</b>
+<a name="75"><font color="#888888 "><i>   75   </i></font></a>    y = <a href="rt_nonfinite_cpp.html#var_rtNaN" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_rtNaN');" target="_self"><font color="#1122aa">rtNaN</font></a>;
+<a name="76"><font color="#888888 "><i>   76   </i></font></a>  <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="77"><font color="#888888 "><i>   77   </i></font></a>    d0 = std::abs(u0);
+<a name="78"><font color="#888888 "><i>   78   </i></font></a>    d1 = std::abs(u1);
+<a name="79"><font color="#888888 "><i>   79   </i></font></a>    <font color="#112266"><b>if</b></font> (<a href="rt_nonfinite_cpp.html#fcn_rtIsInf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rtIsInf');" target="_self"><font color="#1122aa">rtIsInf</font></a>(u1)) <b>{</b>
+<a name="80"><font color="#888888 "><i>   80   </i></font></a>      <font color="#112266"><b>if</b></font> (d0 == 1.0) <b>{</b>
+<a name="81"><font color="#888888 "><i>   81   </i></font></a>        y = 1.0;
+<a name="82"><font color="#888888 "><i>   82   </i></font></a>      <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (d0 &gt; 1.0) <b>{</b>
+<a name="83"><font color="#888888 "><i>   83   </i></font></a>        <font color="#112266"><b>if</b></font> (u1 &gt; 0.0) <b>{</b>
+<a name="84"><font color="#888888 "><i>   84   </i></font></a>          y = <a href="rt_nonfinite_cpp.html#var_rtInf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_rtInf');" target="_self"><font color="#1122aa">rtInf</font></a>;
+<a name="85"><font color="#888888 "><i>   85   </i></font></a>        <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="86"><font color="#888888 "><i>   86   </i></font></a>          y = 0.0;
+<a name="87"><font color="#888888 "><i>   87   </i></font></a>        <b>}</b>
+<a name="88"><font color="#888888 "><i>   88   </i></font></a>      <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (u1 &gt; 0.0) <b>{</b>
+<a name="89"><font color="#888888 "><i>   89   </i></font></a>        y = 0.0;
+<a name="90"><font color="#888888 "><i>   90   </i></font></a>      <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="91"><font color="#888888 "><i>   91   </i></font></a>        y = <a href="rt_nonfinite_cpp.html#var_rtInf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_rtInf');" target="_self"><font color="#1122aa">rtInf</font></a>;
+<a name="92"><font color="#888888 "><i>   92   </i></font></a>      <b>}</b>
+<a name="93"><font color="#888888 "><i>   93   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (d1 == 0.0) <b>{</b>
+<a name="94"><font color="#888888 "><i>   94   </i></font></a>      y = 1.0;
+<a name="95"><font color="#888888 "><i>   95   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (d1 == 1.0) <b>{</b>
+<a name="96"><font color="#888888 "><i>   96   </i></font></a>      <font color="#112266"><b>if</b></font> (u1 &gt; 0.0) <b>{</b>
+<a name="97"><font color="#888888 "><i>   97   </i></font></a>        y = u0;
+<a name="98"><font color="#888888 "><i>   98   </i></font></a>      <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="99"><font color="#888888 "><i>   99   </i></font></a>        y = 1.0 / u0;
+<a name="100"><font color="#888888 "><i>  100   </i></font></a>      <b>}</b>
+<a name="101"><font color="#888888 "><i>  101   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> (u1 == 2.0) <b>{</b>
+<a name="102"><font color="#888888 "><i>  102   </i></font></a>      y = u0 * u0;
+<a name="103"><font color="#888888 "><i>  103   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> ((u1 == 0.5) &amp;&amp; (u0 &gt;= 0.0)) <b>{</b>
+<a name="104"><font color="#888888 "><i>  104   </i></font></a>      y = std::sqrt(u0);
+<a name="105"><font color="#888888 "><i>  105   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <font color="#112266"><b>if</b></font> ((u0 &lt; 0.0) &amp;&amp; (u1 &gt; std::floor(u1))) <b>{</b>
+<a name="106"><font color="#888888 "><i>  106   </i></font></a>      y = <a href="rt_nonfinite_cpp.html#var_rtNaN" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'var_rtNaN');" target="_self"><font color="#1122aa">rtNaN</font></a>;
+<a name="107"><font color="#888888 "><i>  107   </i></font></a>    <b>}</b> <font color="#112266"><b>else</b></font> <b>{</b>
+<a name="108"><font color="#888888 "><i>  108   </i></font></a>      y = pow(u0, u1);
+<a name="109"><font color="#888888 "><i>  109   </i></font></a>    <b>}</b>
+<a name="110"><font color="#888888 "><i>  110   </i></font></a>  <b>}</b>
+<a name="111"><font color="#888888 "><i>  111   </i></font></a>
+<a name="112"><font color="#888888 "><i>  112   </i></font></a>  <font color="#112266"><b>return</b></font> y;
+<a name="113"><font color="#888888 "><i>  113   </i></font></a><b>}</b>
+<a name="114"><font color="#888888 "><i>  114   </i></font></a>
+<a name="115"><font color="#888888 "><i>  115   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="116"><font color="#888888 "><i>  116   </i></font></a><font color="#117755"><i>// CALC_EKF_F_OPTIMIZED</i></font>
+<a name="117"><font color="#888888 "><i>  117   </i></font></a><font color="#117755"><i>//     F = CALC_EKF_F_OPTIMIZED(QLX,QLY,QLZ,RX,RY,RZ,VX,VY,VZ,OMEGAX,OMEGAY,OMEGAZ,MTOT,ITOTXX,ITOTYY,ITOTZZ,T_GEOMCOGX,T_GEOMCOGY,T_GEOMCOGZ,T_GEOMODOMX,T_GEOMODOMY,T_GEOMODOMZ,T_GEOMIMUX,T_GEOMIMUY,IMUBIASACCX,IMUBIASACCY,IMUBIASACCZ,IMUBIASANGVELX,IMUBIASANGVELY,IMUBIASANGVELZ,MOTOR1,MOTOR2,MOTOR3,MOTOR4,DT,T_GEOMIMUZ,W,L,C,K_F)</i></font>
+<a name="118"><font color="#888888 "><i>  118   </i></font></a><font color="#117755"><i>// Arguments    : double qLx</i></font>
+<a name="119"><font color="#888888 "><i>  119   </i></font></a><font color="#117755"><i>//                double qLy</i></font>
+<a name="120"><font color="#888888 "><i>  120   </i></font></a><font color="#117755"><i>//                double qLz</i></font>
+<a name="121"><font color="#888888 "><i>  121   </i></font></a><font color="#117755"><i>//                double rx</i></font>
+<a name="122"><font color="#888888 "><i>  122   </i></font></a><font color="#117755"><i>//                double ry</i></font>
+<a name="123"><font color="#888888 "><i>  123   </i></font></a><font color="#117755"><i>//                double rz</i></font>
+<a name="124"><font color="#888888 "><i>  124   </i></font></a><font color="#117755"><i>//                double vx</i></font>
+<a name="125"><font color="#888888 "><i>  125   </i></font></a><font color="#117755"><i>//                double vy</i></font>
+<a name="126"><font color="#888888 "><i>  126   </i></font></a><font color="#117755"><i>//                double vz</i></font>
+<a name="127"><font color="#888888 "><i>  127   </i></font></a><font color="#117755"><i>//                double Omegax</i></font>
+<a name="128"><font color="#888888 "><i>  128   </i></font></a><font color="#117755"><i>//                double Omegay</i></font>
+<a name="129"><font color="#888888 "><i>  129   </i></font></a><font color="#117755"><i>//                double Omegaz</i></font>
+<a name="130"><font color="#888888 "><i>  130   </i></font></a><font color="#117755"><i>//                double mtot</i></font>
+<a name="131"><font color="#888888 "><i>  131   </i></font></a><font color="#117755"><i>//                double Itotxx</i></font>
+<a name="132"><font color="#888888 "><i>  132   </i></font></a><font color="#117755"><i>//                double Itotyy</i></font>
+<a name="133"><font color="#888888 "><i>  133   </i></font></a><font color="#117755"><i>//                double Itotzz</i></font>
+<a name="134"><font color="#888888 "><i>  134   </i></font></a><font color="#117755"><i>//                double t_GeomCogX</i></font>
+<a name="135"><font color="#888888 "><i>  135   </i></font></a><font color="#117755"><i>//                double t_GeomCogY</i></font>
+<a name="136"><font color="#888888 "><i>  136   </i></font></a><font color="#117755"><i>//                double t_GeomCogZ</i></font>
+<a name="137"><font color="#888888 "><i>  137   </i></font></a><font color="#117755"><i>//                double t_GeomOdomX</i></font>
+<a name="138"><font color="#888888 "><i>  138   </i></font></a><font color="#117755"><i>//                double t_GeomOdomY</i></font>
+<a name="139"><font color="#888888 "><i>  139   </i></font></a><font color="#117755"><i>//                double t_GeomOdomZ</i></font>
+<a name="140"><font color="#888888 "><i>  140   </i></font></a><font color="#117755"><i>//                double t_GeomImuX</i></font>
+<a name="141"><font color="#888888 "><i>  141   </i></font></a><font color="#117755"><i>//                double t_GeomImuY</i></font>
+<a name="142"><font color="#888888 "><i>  142   </i></font></a><font color="#117755"><i>//                double ImuBiasAccX</i></font>
+<a name="143"><font color="#888888 "><i>  143   </i></font></a><font color="#117755"><i>//                double ImuBiasAccY</i></font>
+<a name="144"><font color="#888888 "><i>  144   </i></font></a><font color="#117755"><i>//                double ImuBiasAccZ</i></font>
+<a name="145"><font color="#888888 "><i>  145   </i></font></a><font color="#117755"><i>//                double ImuBiasAngVelX</i></font>
+<a name="146"><font color="#888888 "><i>  146   </i></font></a><font color="#117755"><i>//                double ImuBiasAngVelY</i></font>
+<a name="147"><font color="#888888 "><i>  147   </i></font></a><font color="#117755"><i>//                double ImuBiasAngVelZ</i></font>
+<a name="148"><font color="#888888 "><i>  148   </i></font></a><font color="#117755"><i>//                double motor1</i></font>
+<a name="149"><font color="#888888 "><i>  149   </i></font></a><font color="#117755"><i>//                double motor2</i></font>
+<a name="150"><font color="#888888 "><i>  150   </i></font></a><font color="#117755"><i>//                double motor3</i></font>
+<a name="151"><font color="#888888 "><i>  151   </i></font></a><font color="#117755"><i>//                double motor4</i></font>
+<a name="152"><font color="#888888 "><i>  152   </i></font></a><font color="#117755"><i>//                double dt</i></font>
+<a name="153"><font color="#888888 "><i>  153   </i></font></a><font color="#117755"><i>//                double t_GeomImuZ</i></font>
+<a name="154"><font color="#888888 "><i>  154   </i></font></a><font color="#117755"><i>//                double w</i></font>
+<a name="155"><font color="#888888 "><i>  155   </i></font></a><font color="#117755"><i>//                double l</i></font>
+<a name="156"><font color="#888888 "><i>  156   </i></font></a><font color="#117755"><i>//                double c</i></font>
+<a name="157"><font color="#888888 "><i>  157   </i></font></a><font color="#117755"><i>//                double k_f</i></font>
+<a name="158"><font color="#888888 "><i>  158   </i></font></a><font color="#117755"><i>//                double F[900]</i></font>
+<a name="159"><font color="#888888 "><i>  159   </i></font></a><font color="#117755"><i>// Return Type  : void</i></font>
+<a name="160"><font color="#888888 "><i>  160   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="161"><font color="#888888 "><i>  161   </i></font></a><font color="#112266"><b>void</b></font> <a name="fcn_calc_EKF_F_optimized">calc_EKF_F_optimized</a>(<font color="#112266"><b>double</b></font> qLx, <font color="#112266"><b>double</b></font> qLy, <font color="#112266"><b>double</b></font> qLz, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>,
+<a name="162"><font color="#888888 "><i>  162   </i></font></a>  <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font> Omegax, <font color="#112266"><b>double</b></font> Omegay, <font color="#112266"><b>double</b></font> Omegaz,
+<a name="163"><font color="#888888 "><i>  163   </i></font></a>  <font color="#112266"><b>double</b></font> mtot, <font color="#112266"><b>double</b></font> Itotxx, <font color="#112266"><b>double</b></font> Itotyy, <font color="#112266"><b>double</b></font> Itotzz, <font color="#112266"><b>double</b></font> t_GeomCogX,
+<a name="164"><font color="#888888 "><i>  164   </i></font></a>  <font color="#112266"><b>double</b></font> t_GeomCogY, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>,
+<a name="165"><font color="#888888 "><i>  165   </i></font></a>  <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font> motor1, <font color="#112266"><b>double</b></font> motor2, <font color="#112266"><b>double</b></font>
+<a name="166"><font color="#888888 "><i>  166   </i></font></a>  motor3, <font color="#112266"><b>double</b></font> motor4, <font color="#112266"><b>double</b></font> dt, <font color="#112266"><b>double</b></font>, <font color="#112266"><b>double</b></font> w, <font color="#112266"><b>double</b></font> l, <font color="#112266"><b>double</b></font> c, <font color="#112266"><b>double</b></font>
+<a name="167"><font color="#888888 "><i>  167   </i></font></a>  k_f, <font color="#112266"><b>double</b></font> F[900])
+<a name="168"><font color="#888888 "><i>  168   </i></font></a><b>{</b>
+<a name="169"><font color="#888888 "><i>  169   </i></font></a>  <font color="#112266"><b>double</b></font> t2;
+<a name="170"><font color="#888888 "><i>  170   </i></font></a>  <font color="#112266"><b>double</b></font> t3;
+<a name="171"><font color="#888888 "><i>  171   </i></font></a>  <font color="#112266"><b>double</b></font> t4;
+<a name="172"><font color="#888888 "><i>  172   </i></font></a>  <font color="#112266"><b>double</b></font> t12;
+<a name="173"><font color="#888888 "><i>  173   </i></font></a>  <font color="#112266"><b>double</b></font> t5;
+<a name="174"><font color="#888888 "><i>  174   </i></font></a>  <font color="#112266"><b>double</b></font> t14;
+<a name="175"><font color="#888888 "><i>  175   </i></font></a>  <font color="#112266"><b>double</b></font> t6;
+<a name="176"><font color="#888888 "><i>  176   </i></font></a>  <font color="#112266"><b>double</b></font> t16;
+<a name="177"><font color="#888888 "><i>  177   </i></font></a>  <font color="#112266"><b>double</b></font> t7;
+<a name="178"><font color="#888888 "><i>  178   </i></font></a>  <font color="#112266"><b>double</b></font> t11;
+<a name="179"><font color="#888888 "><i>  179   </i></font></a>  <font color="#112266"><b>double</b></font> t18;
+<a name="180"><font color="#888888 "><i>  180   </i></font></a>  <font color="#112266"><b>double</b></font> t142;
+<a name="181"><font color="#888888 "><i>  181   </i></font></a>  <font color="#112266"><b>double</b></font> t20;
+<a name="182"><font color="#888888 "><i>  182   </i></font></a>  <font color="#112266"><b>double</b></font> t22;
+<a name="183"><font color="#888888 "><i>  183   </i></font></a>  <font color="#112266"><b>double</b></font> t23;
+<a name="184"><font color="#888888 "><i>  184   </i></font></a>  <font color="#112266"><b>double</b></font> t24;
+<a name="185"><font color="#888888 "><i>  185   </i></font></a>  <font color="#112266"><b>double</b></font> t25;
+<a name="186"><font color="#888888 "><i>  186   </i></font></a>  <font color="#112266"><b>double</b></font> t26;
+<a name="187"><font color="#888888 "><i>  187   </i></font></a>  <font color="#112266"><b>double</b></font> t28;
+<a name="188"><font color="#888888 "><i>  188   </i></font></a>  <font color="#112266"><b>double</b></font> t29;
+<a name="189"><font color="#888888 "><i>  189   </i></font></a>  <font color="#112266"><b>double</b></font> t27;
+<a name="190"><font color="#888888 "><i>  190   </i></font></a>  <font color="#112266"><b>double</b></font> t30;
+<a name="191"><font color="#888888 "><i>  191   </i></font></a>  <font color="#112266"><b>double</b></font> t31;
+<a name="192"><font color="#888888 "><i>  192   </i></font></a>  <font color="#112266"><b>double</b></font> t36;
+<a name="193"><font color="#888888 "><i>  193   </i></font></a>  <font color="#112266"><b>double</b></font> t41;
+<a name="194"><font color="#888888 "><i>  194   </i></font></a>  <font color="#112266"><b>double</b></font> t46;
+<a name="195"><font color="#888888 "><i>  195   </i></font></a>  <font color="#112266"><b>double</b></font> t47;
+<a name="196"><font color="#888888 "><i>  196   </i></font></a>  <font color="#112266"><b>double</b></font> t48;
+<a name="197"><font color="#888888 "><i>  197   </i></font></a>  <font color="#112266"><b>double</b></font> t49;
+<a name="198"><font color="#888888 "><i>  198   </i></font></a>  <font color="#112266"><b>double</b></font> t50;
+<a name="199"><font color="#888888 "><i>  199   </i></font></a>  <font color="#112266"><b>double</b></font> t51;
+<a name="200"><font color="#888888 "><i>  200   </i></font></a>  <font color="#112266"><b>double</b></font> t81;
+<a name="201"><font color="#888888 "><i>  201   </i></font></a>  <font color="#112266"><b>double</b></font> t82;
+<a name="202"><font color="#888888 "><i>  202   </i></font></a>  <font color="#112266"><b>double</b></font> t55;
+<a name="203"><font color="#888888 "><i>  203   </i></font></a>  <font color="#112266"><b>double</b></font> t56;
+<a name="204"><font color="#888888 "><i>  204   </i></font></a>  <font color="#112266"><b>double</b></font> t60;
+<a name="205"><font color="#888888 "><i>  205   </i></font></a>  <font color="#112266"><b>double</b></font> t61;
+<a name="206"><font color="#888888 "><i>  206   </i></font></a>  <font color="#112266"><b>double</b></font> t110;
+<a name="207"><font color="#888888 "><i>  207   </i></font></a>  <font color="#112266"><b>double</b></font> t66;
+<a name="208"><font color="#888888 "><i>  208   </i></font></a>  <font color="#112266"><b>double</b></font> t69;
+<a name="209"><font color="#888888 "><i>  209   </i></font></a>  <font color="#112266"><b>double</b></font> t73;
+<a name="210"><font color="#888888 "><i>  210   </i></font></a>  <font color="#112266"><b>double</b></font> t79;
+<a name="211"><font color="#888888 "><i>  211   </i></font></a>  <font color="#112266"><b>double</b></font> t84;
+<a name="212"><font color="#888888 "><i>  212   </i></font></a>  <font color="#112266"><b>double</b></font> t85;
+<a name="213"><font color="#888888 "><i>  213   </i></font></a>  <font color="#112266"><b>double</b></font> t86;
+<a name="214"><font color="#888888 "><i>  214   </i></font></a>  <font color="#112266"><b>double</b></font> t87;
+<a name="215"><font color="#888888 "><i>  215   </i></font></a>  <font color="#112266"><b>double</b></font> t91;
+<a name="216"><font color="#888888 "><i>  216   </i></font></a>  <font color="#112266"><b>double</b></font> t96;
+<a name="217"><font color="#888888 "><i>  217   </i></font></a>  <font color="#112266"><b>double</b></font> t105;
+<a name="218"><font color="#888888 "><i>  218   </i></font></a>  <font color="#112266"><b>double</b></font> t107;
+<a name="219"><font color="#888888 "><i>  219   </i></font></a>  <font color="#112266"><b>double</b></font> t108;
+<a name="220"><font color="#888888 "><i>  220   </i></font></a>  <font color="#112266"><b>double</b></font> t109;
+<a name="221"><font color="#888888 "><i>  221   </i></font></a>  <font color="#112266"><b>double</b></font> t112;
+<a name="222"><font color="#888888 "><i>  222   </i></font></a>  <font color="#112266"><b>double</b></font> t113;
+<a name="223"><font color="#888888 "><i>  223   </i></font></a>  <font color="#112266"><b>double</b></font> t118;
+<a name="224"><font color="#888888 "><i>  224   </i></font></a>  <font color="#112266"><b>double</b></font> t119;
+<a name="225"><font color="#888888 "><i>  225   </i></font></a>  <font color="#112266"><b>double</b></font> t120;
+<a name="226"><font color="#888888 "><i>  226   </i></font></a>  <font color="#112266"><b>double</b></font> t121;
+<a name="227"><font color="#888888 "><i>  227   </i></font></a>  <font color="#112266"><b>double</b></font> t232;
+<a name="228"><font color="#888888 "><i>  228   </i></font></a>  <font color="#112266"><b>double</b></font> t233;
+<a name="229"><font color="#888888 "><i>  229   </i></font></a>  <font color="#112266"><b>double</b></font> t234;
+<a name="230"><font color="#888888 "><i>  230   </i></font></a>  <font color="#112266"><b>double</b></font> t235;
+<a name="231"><font color="#888888 "><i>  231   </i></font></a>  <font color="#112266"><b>double</b></font> t130;
+<a name="232"><font color="#888888 "><i>  232   </i></font></a>  <font color="#112266"><b>double</b></font> t132;
+<a name="233"><font color="#888888 "><i>  233   </i></font></a>  <font color="#112266"><b>double</b></font> t141;
+<a name="234"><font color="#888888 "><i>  234   </i></font></a>  <font color="#112266"><b>double</b></font> t147;
+<a name="235"><font color="#888888 "><i>  235   </i></font></a>  <font color="#112266"><b>double</b></font> t152;
+<a name="236"><font color="#888888 "><i>  236   </i></font></a>  <font color="#112266"><b>double</b></font> t159;
+<a name="237"><font color="#888888 "><i>  237   </i></font></a>  <font color="#112266"><b>double</b></font> t166;
+<a name="238"><font color="#888888 "><i>  238   </i></font></a>  <font color="#112266"><b>double</b></font> t170;
+<a name="239"><font color="#888888 "><i>  239   </i></font></a>  <font color="#112266"><b>double</b></font> t178;
+<a name="240"><font color="#888888 "><i>  240   </i></font></a>  <font color="#112266"><b>double</b></font> t180;
+<a name="241"><font color="#888888 "><i>  241   </i></font></a>  <font color="#112266"><b>double</b></font> t185;
+<a name="242"><font color="#888888 "><i>  242   </i></font></a>  <font color="#112266"><b>double</b></font> t190;
+<a name="243"><font color="#888888 "><i>  243   </i></font></a>  <font color="#112266"><b>double</b></font> t199;
+<a name="244"><font color="#888888 "><i>  244   </i></font></a>  <font color="#112266"><b>double</b></font> t201;
+<a name="245"><font color="#888888 "><i>  245   </i></font></a>  <font color="#112266"><b>double</b></font> t216;
+<a name="246"><font color="#888888 "><i>  246   </i></font></a>  <font color="#112266"><b>double</b></font> t231;
+<a name="247"><font color="#888888 "><i>  247   </i></font></a>  <font color="#112266"><b>double</b></font> t247;
+<a name="248"><font color="#888888 "><i>  248   </i></font></a>  <font color="#112266"><b>double</b></font> t262;
+<a name="249"><font color="#888888 "><i>  249   </i></font></a>  <font color="#112266"><b>double</b></font> t278;
+<a name="250"><font color="#888888 "><i>  250   </i></font></a>  <font color="#112266"><b>double</b></font> t330;
+<a name="251"><font color="#888888 "><i>  251   </i></font></a>  <font color="#112266"><b>double</b></font> t332;
+<a name="252"><font color="#888888 "><i>  252   </i></font></a>  <font color="#112266"><b>double</b></font> t335;
+<a name="253"><font color="#888888 "><i>  253   </i></font></a>  <font color="#112266"><b>double</b></font> b_t55[900];
+<a name="254"><font color="#888888 "><i>  254   </i></font></a>  <font color="#112266"><b>int</b></font> i0;
+<a name="255"><font color="#888888 "><i>  255   </i></font></a>
+<a name="256"><font color="#888888 "><i>  256   </i></font></a>  <font color="#117755"><i>//     This function was generated by the Symbolic Math Toolbox version 8.0.</i></font>
+<a name="257"><font color="#888888 "><i>  257   </i></font></a>  <font color="#117755"><i>//     26-Feb-2019 22:06:14</i></font>
+<a name="258"><font color="#888888 "><i>  258   </i></font></a>  t2 = std::abs(qLx);
+<a name="259"><font color="#888888 "><i>  259   </i></font></a>  t3 = std::abs(qLy);
+<a name="260"><font color="#888888 "><i>  260   </i></font></a>  t4 = std::abs(qLz);
+<a name="261"><font color="#888888 "><i>  261   </i></font></a>  t12 = Omegax * dt;
+<a name="262"><font color="#888888 "><i>  262   </i></font></a>  t5 = std::abs(t12);
+<a name="263"><font color="#888888 "><i>  263   </i></font></a>  t14 = Omegay * dt;
+<a name="264"><font color="#888888 "><i>  264   </i></font></a>  t6 = std::abs(t14);
+<a name="265"><font color="#888888 "><i>  265   </i></font></a>  t16 = Omegaz * dt;
+<a name="266"><font color="#888888 "><i>  266   </i></font></a>  t7 = std::abs(t16);
+<a name="267"><font color="#888888 "><i>  267   </i></font></a>  t11 = (t2 * t2 + t3 * t3) + t4 * t4;
+<a name="268"><font color="#888888 "><i>  268   </i></font></a>  t18 = (t5 * t5 + t6 * t6) + t7 * t7;
+<a name="269"><font color="#888888 "><i>  269   </i></font></a>  t142 = t18;
+<a name="270"><font color="#888888 "><i>  270   </i></font></a>  <a href="sqrt_cpp.html#fcn_b_sqrt" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sqrt');" target="_self"><font color="#1122aa">b_sqrt</font></a>(&amp;t142);
+<a name="271"><font color="#888888 "><i>  271   </i></font></a>  t20 = t142 * 0.5;
+<a name="272"><font color="#888888 "><i>  272   </i></font></a>  t142 = t11;
+<a name="273"><font color="#888888 "><i>  273   </i></font></a>  <a href="sqrt_cpp.html#fcn_b_sqrt" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sqrt');" target="_self"><font color="#1122aa">b_sqrt</font></a>(&amp;t142);
+<a name="274"><font color="#888888 "><i>  274   </i></font></a>  t22 = t142 * 0.5;
+<a name="275"><font color="#888888 "><i>  275   </i></font></a>  t23 = std::sin(t20);
+<a name="276"><font color="#888888 "><i>  276   </i></font></a>  t24 = std::sin(t22);
+<a name="277"><font color="#888888 "><i>  277   </i></font></a>  t142 = t18;
+<a name="278"><font color="#888888 "><i>  278   </i></font></a>  <a href="sqrt_cpp.html#fcn_b_sqrt" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sqrt');" target="_self"><font color="#1122aa">b_sqrt</font></a>(&amp;t142);
+<a name="279"><font color="#888888 "><i>  279   </i></font></a>  t25 = 1.0 / t142;
+<a name="280"><font color="#888888 "><i>  280   </i></font></a>  t142 = t11;
+<a name="281"><font color="#888888 "><i>  281   </i></font></a>  <a href="sqrt_cpp.html#fcn_b_sqrt" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sqrt');" target="_self"><font color="#1122aa">b_sqrt</font></a>(&amp;t142);
+<a name="282"><font color="#888888 "><i>  282   </i></font></a>  t26 = 1.0 / t142;
+<a name="283"><font color="#888888 "><i>  283   </i></font></a>  t28 = std::cos(t20);
+<a name="284"><font color="#888888 "><i>  284   </i></font></a>  t29 = std::cos(t22);
+<a name="285"><font color="#888888 "><i>  285   </i></font></a>  t27 = ((qLx * t24 * t26 * t28 + Omegax * dt * t23 * t25 * t29) + Omegaz * dt *
+<a name="286"><font color="#888888 "><i>  286   </i></font></a>         qLy * t23 * t24 * t25 * t26) - Omegay * dt * qLz * t23 * t24 * t25 *
+<a name="287"><font color="#888888 "><i>  287   </i></font></a>    t26;
+<a name="288"><font color="#888888 "><i>  288   </i></font></a>  t30 = ((qLy * t24 * t26 * t28 + Omegay * dt * t23 * t25 * t29) - Omegaz * dt *
+<a name="289"><font color="#888888 "><i>  289   </i></font></a>         qLx * t23 * t24 * t25 * t26) + Omegax * dt * qLz * t23 * t24 * t25 *
+<a name="290"><font color="#888888 "><i>  290   </i></font></a>    t26;
+<a name="291"><font color="#888888 "><i>  291   </i></font></a>  t31 = ((qLz * t24 * t26 * t28 + Omegaz * dt * t23 * t25 * t29) + Omegay * dt *
+<a name="292"><font color="#888888 "><i>  292   </i></font></a>         qLx * t23 * t24 * t25 * t26) - Omegax * dt * qLy * t23 * t24 * t25 *
+<a name="293"><font color="#888888 "><i>  293   </i></font></a>    t26;
+<a name="294"><font color="#888888 "><i>  294   </i></font></a>  t36 = t27 * t27;
+<a name="295"><font color="#888888 "><i>  295   </i></font></a>  t41 = t30 * t30;
+<a name="296"><font color="#888888 "><i>  296   </i></font></a>  t46 = t31 * t31;
+<a name="297"><font color="#888888 "><i>  297   </i></font></a>  t47 = (t36 + t41) + t46;
+<a name="298"><font color="#888888 "><i>  298   </i></font></a>  t48 = qLx;
+<a name="299"><font color="#888888 "><i>  299   </i></font></a>  <a href="sign_cpp.html#fcn_b_sign" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sign');" target="_self"><font color="#1122aa">b_sign</font></a>(&amp;t48);
+<a name="300"><font color="#888888 "><i>  300   </i></font></a>  t49 = 1.0 / <a href="#fcn_rt_powd_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_powd_snf');" target="_self"><font color="#1122aa">rt_powd_snf</font></a>(t11, 1.5);
+<a name="301"><font color="#888888 "><i>  301   </i></font></a>  t50 = 1.0 / t11;
+<a name="302"><font color="#888888 "><i>  302   </i></font></a>  t51 = t47;
+<a name="303"><font color="#888888 "><i>  303   </i></font></a>  <a href="sqrt_cpp.html#fcn_b_sqrt" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sqrt');" target="_self"><font color="#1122aa">b_sqrt</font></a>(&amp;t51);
+<a name="304"><font color="#888888 "><i>  304   </i></font></a>  t20 = t28 * t29;
+<a name="305"><font color="#888888 "><i>  305   </i></font></a>  t22 = Omegax * dt * qLx * t23 * t24 * t25 * t26;
+<a name="306"><font color="#888888 "><i>  306   </i></font></a>  t81 = Omegay * dt * qLy * t23 * t24 * t25 * t26;
+<a name="307"><font color="#888888 "><i>  307   </i></font></a>  t82 = Omegaz * dt * qLz * t23 * t24 * t25 * t26;
+<a name="308"><font color="#888888 "><i>  308   </i></font></a>  t55 = <a href="#fcn_rt_atan2d_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_atan2d_snf');" target="_self"><font color="#1122aa">rt_atan2d_snf</font></a>(t51, ((t20 - t22) - t81) - t82);
+<a name="309"><font color="#888888 "><i>  309   </i></font></a>  t56 = t24 * t26 * t28;
+<a name="310"><font color="#888888 "><i>  310   </i></font></a>  t60 = ((((((t56 + qLx * t2 * t28 * t29 * t48 * t50 * 0.5) + Omegay * dt * qLz *
+<a name="311"><font color="#888888 "><i>  311   </i></font></a>             t2 * t23 * t24 * t25 * t48 * t49) + Omegaz * dt * qLy * t2 * t23 *
+<a name="312"><font color="#888888 "><i>  312   </i></font></a>            t25 * t29 * t48 * t50 * 0.5) - qLx * t2 * t24 * t28 * t48 * t49) -
+<a name="313"><font color="#888888 "><i>  313   </i></font></a>          Omegax * dt * t2 * t23 * t24 * t25 * t26 * t48 * 0.5) - Omegaz * dt *
+<a name="314"><font color="#888888 "><i>  314   </i></font></a>         qLy * t2 * t23 * t24 * t25 * t48 * t49) - Omegay * dt * qLz * t2 * t23 *
+<a name="315"><font color="#888888 "><i>  315   </i></font></a>    t25 * t29 * t48 * t50 * 0.5;
+<a name="316"><font color="#888888 "><i>  316   </i></font></a>  t142 = t47;
+<a name="317"><font color="#888888 "><i>  317   </i></font></a>  <a href="sqrt_cpp.html#fcn_b_sqrt" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sqrt');" target="_self"><font color="#1122aa">b_sqrt</font></a>(&amp;t142);
+<a name="318"><font color="#888888 "><i>  318   </i></font></a>  t61 = 1.0 / t142;
+<a name="319"><font color="#888888 "><i>  319   </i></font></a>  t110 = Omegay * dt * t23 * t24 * t25 * t26;
+<a name="320"><font color="#888888 "><i>  320   </i></font></a>  t66 = ((((((qLz * t2 * t24 * t28 * t48 * t49 + Omegaz * dt * t2 * t23 * t24 *
+<a name="321"><font color="#888888 "><i>  321   </i></font></a>              t25 * t26 * t48 * 0.5) + Omegay * dt * qLx * t2 * t23 * t24 * t25 *
+<a name="322"><font color="#888888 "><i>  322   </i></font></a>             t48 * t49) + Omegax * dt * qLy * t2 * t23 * t25 * t29 * t48 * t50 *
+<a name="323"><font color="#888888 "><i>  323   </i></font></a>            0.5) - t110) - qLz * t2 * t28 * t29 * t48 * t50 * 0.5) - Omegax * dt
+<a name="324"><font color="#888888 "><i>  324   </i></font></a>         * qLy * t2 * t23 * t24 * t25 * t48 * t49) - Omegay * dt * qLx * t2 *
+<a name="325"><font color="#888888 "><i>  325   </i></font></a>    t23 * t25 * t29 * t48 * t50 * 0.5;
+<a name="326"><font color="#888888 "><i>  326   </i></font></a>  t69 = Omegaz * dt * t23 * t24 * t25 * t26;
+<a name="327"><font color="#888888 "><i>  327   </i></font></a>  t73 = ((((((qLy * t2 * t24 * t28 * t48 * t49 + t69) + Omegay * dt * t2 * t23 *
+<a name="328"><font color="#888888 "><i>  328   </i></font></a>             t24 * t25 * t26 * t48 * 0.5) + Omegax * dt * qLz * t2 * t23 * t24 *
+<a name="329"><font color="#888888 "><i>  329   </i></font></a>            t25 * t48 * t49) + Omegaz * dt * qLx * t2 * t23 * t25 * t29 * t48 *
+<a name="330"><font color="#888888 "><i>  330   </i></font></a>           t50 * 0.5) - qLy * t2 * t28 * t29 * t48 * t50 * 0.5) - Omegaz * dt *
+<a name="331"><font color="#888888 "><i>  331   </i></font></a>         qLx * t2 * t23 * t24 * t25 * t48 * t49) - Omegax * dt * qLz * t2 * t23 *
+<a name="332"><font color="#888888 "><i>  332   </i></font></a>    t25 * t29 * t48 * t50 * 0.5;
+<a name="333"><font color="#888888 "><i>  333   </i></font></a>  t79 = (t31 * t66 * 2.0 + t30 * t73 * 2.0) - t27 * t60 * 2.0;
+<a name="334"><font color="#888888 "><i>  334   </i></font></a>  t20 = ((-t20 + t22) + t81) + t82;
+<a name="335"><font color="#888888 "><i>  335   </i></font></a>  t84 = t20 * t20;
+<a name="336"><font color="#888888 "><i>  336   </i></font></a>  t85 = qLy;
+<a name="337"><font color="#888888 "><i>  337   </i></font></a>  <a href="sign_cpp.html#fcn_b_sign" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sign');" target="_self"><font color="#1122aa">b_sign</font></a>(&amp;t85);
+<a name="338"><font color="#888888 "><i>  338   </i></font></a>  t86 = 1.0 / <a href="#fcn_rt_powd_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_powd_snf');" target="_self"><font color="#1122aa">rt_powd_snf</font></a>(t47, 1.5);
+<a name="339"><font color="#888888 "><i>  339   </i></font></a>  t87 = Omegax * dt * t23 * t24 * t25 * t26;
+<a name="340"><font color="#888888 "><i>  340   </i></font></a>  t91 = ((((((t69 + qLx * t3 * t28 * t29 * t50 * t85 * 0.5) + Omegay * dt * qLz *
+<a name="341"><font color="#888888 "><i>  341   </i></font></a>             t3 * t23 * t24 * t25 * t49 * t85) + Omegaz * dt * qLy * t3 * t23 *
+<a name="342"><font color="#888888 "><i>  342   </i></font></a>            t25 * t29 * t50 * t85 * 0.5) - qLx * t3 * t24 * t28 * t49 * t85) -
+<a name="343"><font color="#888888 "><i>  343   </i></font></a>          Omegax * dt * t3 * t23 * t24 * t25 * t26 * t85 * 0.5) - Omegaz * dt *
+<a name="344"><font color="#888888 "><i>  344   </i></font></a>         qLy * t3 * t23 * t24 * t25 * t49 * t85) - Omegay * dt * qLz * t3 * t23 *
+<a name="345"><font color="#888888 "><i>  345   </i></font></a>    t25 * t29 * t50 * t85 * 0.5;
+<a name="346"><font color="#888888 "><i>  346   </i></font></a>  t96 = ((((((t87 + qLz * t3 * t24 * t28 * t49 * t85) + Omegaz * dt * t3 * t23 *
+<a name="347"><font color="#888888 "><i>  347   </i></font></a>             t24 * t25 * t26 * t85 * 0.5) + Omegay * dt * qLx * t3 * t23 * t24 *
+<a name="348"><font color="#888888 "><i>  348   </i></font></a>            t25 * t49 * t85) + Omegax * dt * qLy * t3 * t23 * t25 * t29 * t50 *
+<a name="349"><font color="#888888 "><i>  349   </i></font></a>           t85 * 0.5) - qLz * t3 * t28 * t29 * t50 * t85 * 0.5) - Omegax * dt *
+<a name="350"><font color="#888888 "><i>  350   </i></font></a>         qLy * t3 * t23 * t24 * t25 * t49 * t85) - Omegay * dt * qLx * t3 * t23 *
+<a name="351"><font color="#888888 "><i>  351   </i></font></a>    t25 * t29 * t50 * t85 * 0.5;
+<a name="352"><font color="#888888 "><i>  352   </i></font></a>  t105 = ((((((t56 + qLy * t3 * t28 * t29 * t50 * t85 * 0.5) + Omegaz * dt * qLx
+<a name="353"><font color="#888888 "><i>  353   </i></font></a>              * t3 * t23 * t24 * t25 * t49 * t85) + Omegax * dt * qLz * t3 * t23
+<a name="354"><font color="#888888 "><i>  354   </i></font></a>             * t25 * t29 * t50 * t85 * 0.5) - qLy * t3 * t24 * t28 * t49 * t85)
+<a name="355"><font color="#888888 "><i>  355   </i></font></a>           - Omegay * dt * t3 * t23 * t24 * t25 * t26 * t85 * 0.5) - Omegax * dt
+<a name="356"><font color="#888888 "><i>  356   </i></font></a>          * qLz * t3 * t23 * t24 * t25 * t49 * t85) - Omegaz * dt * qLx * t3 *
+<a name="357"><font color="#888888 "><i>  357   </i></font></a>    t23 * t25 * t29 * t50 * t85 * 0.5;
+<a name="358"><font color="#888888 "><i>  358   </i></font></a>  t107 = 1.0 / t20;
+<a name="359"><font color="#888888 "><i>  359   </i></font></a>  t108 = (t27 * t91 * 2.0 + t30 * t105 * 2.0) - t31 * t96 * 2.0;
+<a name="360"><font color="#888888 "><i>  360   </i></font></a>  t109 = 1.0 / (t20 * t20);
+<a name="361"><font color="#888888 "><i>  361   </i></font></a>  t112 = 1.0 / (((t36 + t41) + t46) + t84);
+<a name="362"><font color="#888888 "><i>  362   </i></font></a>  t113 = qLz;
+<a name="363"><font color="#888888 "><i>  363   </i></font></a>  <a href="sign_cpp.html#fcn_b_sign" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sign');" target="_self"><font color="#1122aa">b_sign</font></a>(&amp;t113);
+<a name="364"><font color="#888888 "><i>  364   </i></font></a>  t118 = ((((((t110 + qLx * t4 * t24 * t28 * t49 * t113) + Omegax * dt * t4 *
+<a name="365"><font color="#888888 "><i>  365   </i></font></a>              t23 * t24 * t25 * t26 * t113 * 0.5) + Omegaz * dt * qLy * t4 * t23
+<a name="366"><font color="#888888 "><i>  366   </i></font></a>             * t24 * t25 * t49 * t113) + Omegay * dt * qLz * t4 * t23 * t25 *
+<a name="367"><font color="#888888 "><i>  367   </i></font></a>            t29 * t50 * t113 * 0.5) - qLx * t4 * t28 * t29 * t50 * t113 * 0.5) -
+<a name="368"><font color="#888888 "><i>  368   </i></font></a>          Omegay * dt * qLz * t4 * t23 * t24 * t25 * t49 * t113) - Omegaz * dt *
+<a name="369"><font color="#888888 "><i>  369   </i></font></a>    qLy * t4 * t23 * t25 * t29 * t50 * t113 * 0.5;
+<a name="370"><font color="#888888 "><i>  370   </i></font></a>  t119 = qLy * t4 * t28 * t29 * t50 * t113 * 0.5;
+<a name="371"><font color="#888888 "><i>  371   </i></font></a>  t120 = Omegaz * dt * qLx * t4 * t23 * t24 * t25 * t49 * t113;
+<a name="372"><font color="#888888 "><i>  372   </i></font></a>  t121 = Omegax * dt * qLz * t4 * t23 * t25 * t29 * t50 * t113 * 0.5;
+<a name="373"><font color="#888888 "><i>  373   </i></font></a>  t232 = qLy * t4 * t24 * t28 * t49 * t113;
+<a name="374"><font color="#888888 "><i>  374   </i></font></a>  t233 = Omegay * dt * t4 * t23 * t24 * t25 * t26 * t113 * 0.5;
+<a name="375"><font color="#888888 "><i>  375   </i></font></a>  t234 = Omegax * dt * qLz * t4 * t23 * t24 * t25 * t49 * t113;
+<a name="376"><font color="#888888 "><i>  376   </i></font></a>  t235 = Omegaz * dt * qLx * t4 * t23 * t25 * t29 * t50 * t113 * 0.5;
+<a name="377"><font color="#888888 "><i>  377   </i></font></a>  t130 = ((((((t56 + qLz * t4 * t28 * t29 * t50 * t113 * 0.5) + Omegax * dt *
+<a name="378"><font color="#888888 "><i>  378   </i></font></a>              qLy * t4 * t23 * t24 * t25 * t49 * t113) + Omegay * dt * qLx * t4 *
+<a name="379"><font color="#888888 "><i>  379   </i></font></a>             t23 * t25 * t29 * t50 * t113 * 0.5) - qLz * t4 * t24 * t28 * t49 *
+<a name="380"><font color="#888888 "><i>  380   </i></font></a>            t113) - Omegaz * dt * t4 * t23 * t24 * t25 * t26 * t113 * 0.5) -
+<a name="381"><font color="#888888 "><i>  381   </i></font></a>          Omegay * dt * qLx * t4 * t23 * t24 * t25 * t49 * t113) - Omegax * dt *
+<a name="382"><font color="#888888 "><i>  382   </i></font></a>    qLy * t4 * t23 * t25 * t29 * t50 * t113 * 0.5;
+<a name="383"><font color="#888888 "><i>  383   </i></font></a>  t132 = (t30 * (((((((t87 + t119) + t120) + t121) - t232) - t233) - t234) -
+<a name="384"><font color="#888888 "><i>  384   </i></font></a>                 t235) * 2.0 + t31 * t130 * 2.0) - t27 * t118 * 2.0;
+<a name="385"><font color="#888888 "><i>  385   </i></font></a>  t47 = dt * dt;
+<a name="386"><font color="#888888 "><i>  386   </i></font></a>  <a href="sign_cpp.html#fcn_b_sign" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sign');" target="_self"><font color="#1122aa">b_sign</font></a>(&amp;t12);
+<a name="387"><font color="#888888 "><i>  387   </i></font></a>  t36 = 1.0 / t18;
+<a name="388"><font color="#888888 "><i>  388   </i></font></a>  t81 = 1.0 / <a href="#fcn_rt_powd_snf" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_rt_powd_snf');" target="_self"><font color="#1122aa">rt_powd_snf</font></a>(t18, 1.5);
+<a name="389"><font color="#888888 "><i>  389   </i></font></a>  t20 = dt * t23 * t25 * t29;
+<a name="390"><font color="#888888 "><i>  390   </i></font></a>  t141 = ((((((t20 + Omegax * t5 * t28 * t29 * t47 * t12 * t36 * 0.5) + Omegaz *
+<a name="391"><font color="#888888 "><i>  391   </i></font></a>              qLy * t5 * t24 * t26 * t28 * t47 * t12 * t36 * 0.5) + Omegay * qLz
+<a name="392"><font color="#888888 "><i>  392   </i></font></a>             * t5 * t23 * t24 * t26 * t47 * t12 * t81) - Omegax * t5 * t23 * t29
+<a name="393"><font color="#888888 "><i>  393   </i></font></a>            * t47 * t12 * t81) - dt * qLx * t5 * t23 * t24 * t25 * t26 * t12 *
+<a name="394"><font color="#888888 "><i>  394   </i></font></a>           0.5) - Omegay * qLz * t5 * t24 * t26 * t28 * t47 * t12 * t36 * 0.5) -
+<a name="395"><font color="#888888 "><i>  395   </i></font></a>    Omegaz * qLy * t5 * t23 * t24 * t26 * t47 * t12 * t81;
+<a name="396"><font color="#888888 "><i>  396   </i></font></a>  t142 = dt * qLy * t23 * t24 * t25 * t26;
+<a name="397"><font color="#888888 "><i>  397   </i></font></a>  t147 = ((((((t142 + Omegaz * t5 * t23 * t29 * t47 * t12 * t81) + dt * qLz * t5
+<a name="398"><font color="#888888 "><i>  398   </i></font></a>              * t23 * t24 * t25 * t26 * t12 * 0.5) + Omegax * qLy * t5 * t24 *
+<a name="399"><font color="#888888 "><i>  399   </i></font></a>             t26 * t28 * t47 * t12 * t36 * 0.5) + Omegay * qLx * t5 * t23 * t24 *
+<a name="400"><font color="#888888 "><i>  400   </i></font></a>            t26 * t47 * t12 * t81) - Omegaz * t5 * t28 * t29 * t47 * t12 * t36 *
+<a name="401"><font color="#888888 "><i>  401   </i></font></a>           0.5) - Omegay * qLx * t5 * t24 * t26 * t28 * t47 * t12 * t36 * 0.5) -
+<a name="402"><font color="#888888 "><i>  402   </i></font></a>    Omegax * qLy * t5 * t23 * t24 * t26 * t47 * t12 * t81;
+<a name="403"><font color="#888888 "><i>  403   </i></font></a>  t82 = dt * qLz * t23 * t24 * t25 * t26;
+<a name="404"><font color="#888888 "><i>  404   </i></font></a>  t152 = ((((((t82 + Omegay * t5 * t28 * t29 * t47 * t12 * t36 * 0.5) + Omegax *
+<a name="405"><font color="#888888 "><i>  405   </i></font></a>              qLz * t5 * t24 * t26 * t28 * t47 * t12 * t36 * 0.5) + Omegaz * qLx
+<a name="406"><font color="#888888 "><i>  406   </i></font></a>             * t5 * t23 * t24 * t26 * t47 * t12 * t81) - Omegay * t5 * t23 * t29
+<a name="407"><font color="#888888 "><i>  407   </i></font></a>            * t47 * t12 * t81) - dt * qLy * t5 * t23 * t24 * t25 * t26 * t12 *
+<a name="408"><font color="#888888 "><i>  408   </i></font></a>           0.5) - Omegaz * qLx * t5 * t24 * t26 * t28 * t47 * t12 * t36 * 0.5) -
+<a name="409"><font color="#888888 "><i>  409   </i></font></a>    Omegax * qLz * t5 * t23 * t24 * t26 * t47 * t12 * t81;
+<a name="410"><font color="#888888 "><i>  410   </i></font></a>  t159 = (t30 * t152 * 2.0 + t27 * t141 * 2.0) - t31 * t147 * 2.0;
+<a name="411"><font color="#888888 "><i>  411   </i></font></a>  <a href="sign_cpp.html#fcn_b_sign" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sign');" target="_self"><font color="#1122aa">b_sign</font></a>(&amp;t14);
+<a name="412"><font color="#888888 "><i>  412   </i></font></a>  t22 = dt * qLx * t23 * t24 * t25 * t26;
+<a name="413"><font color="#888888 "><i>  413   </i></font></a>  t166 = ((((((t82 + Omegax * t6 * t23 * t29 * t47 * t81 * t14) + dt * qLx * t6 *
+<a name="414"><font color="#888888 "><i>  414   </i></font></a>              t23 * t24 * t25 * t26 * t14 * 0.5) + Omegay * qLz * t6 * t24 * t26
+<a name="415"><font color="#888888 "><i>  415   </i></font></a>             * t28 * t47 * t36 * t14 * 0.5) + Omegaz * qLy * t6 * t23 * t24 *
+<a name="416"><font color="#888888 "><i>  416   </i></font></a>            t26 * t47 * t81 * t14) - Omegax * t6 * t28 * t29 * t47 * t36 * t14 *
+<a name="417"><font color="#888888 "><i>  417   </i></font></a>           0.5) - Omegaz * qLy * t6 * t24 * t26 * t28 * t47 * t36 * t14 * 0.5) -
+<a name="418"><font color="#888888 "><i>  418   </i></font></a>    Omegay * qLz * t6 * t23 * t24 * t26 * t47 * t81 * t14;
+<a name="419"><font color="#888888 "><i>  419   </i></font></a>  t170 = ((((((t22 + Omegaz * t6 * t28 * t29 * t47 * t36 * t14 * 0.5) + Omegay *
+<a name="420"><font color="#888888 "><i>  420   </i></font></a>              qLx * t6 * t24 * t26 * t28 * t47 * t36 * t14 * 0.5) + Omegax * qLy
+<a name="421"><font color="#888888 "><i>  421   </i></font></a>             * t6 * t23 * t24 * t26 * t47 * t81 * t14) - Omegaz * t6 * t23 * t29
+<a name="422"><font color="#888888 "><i>  422   </i></font></a>            * t47 * t81 * t14) - dt * qLz * t6 * t23 * t24 * t25 * t26 * t14 *
+<a name="423"><font color="#888888 "><i>  423   </i></font></a>           0.5) - Omegax * qLy * t6 * t24 * t26 * t28 * t47 * t36 * t14 * 0.5) -
+<a name="424"><font color="#888888 "><i>  424   </i></font></a>    Omegay * qLx * t6 * t23 * t24 * t26 * t47 * t81 * t14;
+<a name="425"><font color="#888888 "><i>  425   </i></font></a>  t178 = ((((((t20 + Omegay * t6 * t28 * t29 * t47 * t36 * t14 * 0.5) + Omegax *
+<a name="426"><font color="#888888 "><i>  426   </i></font></a>              qLz * t6 * t24 * t26 * t28 * t47 * t36 * t14 * 0.5) + Omegaz * qLx
+<a name="427"><font color="#888888 "><i>  427   </i></font></a>             * t6 * t23 * t24 * t26 * t47 * t81 * t14) - Omegay * t6 * t23 * t29
+<a name="428"><font color="#888888 "><i>  428   </i></font></a>            * t47 * t81 * t14) - dt * qLy * t6 * t23 * t24 * t25 * t26 * t14 *
+<a name="429"><font color="#888888 "><i>  429   </i></font></a>           0.5) - Omegaz * qLx * t6 * t24 * t26 * t28 * t47 * t36 * t14 * 0.5) -
+<a name="430"><font color="#888888 "><i>  430   </i></font></a>    Omegax * qLz * t6 * t23 * t24 * t26 * t47 * t81 * t14;
+<a name="431"><font color="#888888 "><i>  431   </i></font></a>  t180 = (t31 * t170 * 2.0 + t30 * t178 * 2.0) - t27 * t166 * 2.0;
+<a name="432"><font color="#888888 "><i>  432   </i></font></a>  <a href="sign_cpp.html#fcn_b_sign" onclick="if (top) if (top.docHiliteMe) top.docHiliteMe(window, 'fcn_b_sign');" target="_self"><font color="#1122aa">b_sign</font></a>(&amp;t16);
+<a name="433"><font color="#888888 "><i>  433   </i></font></a>  t185 = ((((((t142 + Omegax * t7 * t28 * t29 * t47 * t36 * t16 * 0.5) + Omegaz *
+<a name="434"><font color="#888888 "><i>  434   </i></font></a>              qLy * t7 * t24 * t26 * t28 * t47 * t36 * t16 * 0.5) + Omegay * qLz
+<a name="435"><font color="#888888 "><i>  435   </i></font></a>             * t7 * t23 * t24 * t26 * t47 * t81 * t16) - Omegax * t7 * t23 * t29
+<a name="436"><font color="#888888 "><i>  436   </i></font></a>            * t47 * t81 * t16) - dt * qLx * t7 * t23 * t24 * t25 * t26 * t16 *
+<a name="437"><font color="#888888 "><i>  437   </i></font></a>           0.5) - Omegay * qLz * t7 * t24 * t26 * t28 * t47 * t36 * t16 * 0.5) -
+<a name="438"><font color="#888888 "><i>  438   </i></font></a>    Omegaz * qLy * t7 * t23 * t24 * t26 * t47 * t81 * t16;
+<a name="439"><font color="#888888 "><i>  439   </i></font></a>  t190 = ((((((t22 + Omegay * t7 * t23 * t29 * t47 * t81 * t16) + dt * qLy * t7 *
+<a name="440"><font color="#888888 "><i>  440   </i></font></a>              t23 * t24 * t25 * t26 * t16 * 0.5) + Omegaz * qLx * t7 * t24 * t26
+<a name="441"><font color="#888888 "><i>  441   </i></font></a>             * t28 * t47 * t36 * t16 * 0.5) + Omegax * qLz * t7 * t23 * t24 *
+<a name="442"><font color="#888888 "><i>  442   </i></font></a>            t26 * t47 * t81 * t16) - Omegay * t7 * t28 * t29 * t47 * t36 * t16 *
+<a name="443"><font color="#888888 "><i>  443   </i></font></a>           0.5) - Omegax * qLz * t7 * t24 * t26 * t28 * t47 * t36 * t16 * 0.5) -
+<a name="444"><font color="#888888 "><i>  444   </i></font></a>    Omegaz * qLx * t7 * t23 * t24 * t26 * t47 * t81 * t16;
+<a name="445"><font color="#888888 "><i>  445   </i></font></a>  t199 = ((((((t20 + Omegaz * t7 * t28 * t29 * t47 * t36 * t16 * 0.5) + Omegay *
+<a name="446"><font color="#888888 "><i>  446   </i></font></a>              qLx * t7 * t24 * t26 * t28 * t47 * t36 * t16 * 0.5) + Omegax * qLy
+<a name="447"><font color="#888888 "><i>  447   </i></font></a>             * t7 * t23 * t24 * t26 * t47 * t81 * t16) - Omegaz * t7 * t23 * t29
+<a name="448"><font color="#888888 "><i>  448   </i></font></a>            * t47 * t81 * t16) - dt * qLz * t7 * t23 * t24 * t25 * t26 * t16 *
+<a name="449"><font color="#888888 "><i>  449   </i></font></a>           0.5) - Omegax * qLy * t7 * t24 * t26 * t28 * t47 * t36 * t16 * 0.5) -
+<a name="450"><font color="#888888 "><i>  450   </i></font></a>    Omegay * qLx * t7 * t23 * t24 * t26 * t47 * t81 * t16;
+<a name="451"><font color="#888888 "><i>  451   </i></font></a>  t201 = (t27 * t185 * 2.0 + t31 * t199 * 2.0) - t30 * t190 * 2.0;
+<a name="452"><font color="#888888 "><i>  452   </i></font></a>  t216 = t61 * t79 * t107 * 0.5 + t51 * t109 * (((((((t87 + t2 * t24 * t26 * t28
+<a name="453"><font color="#888888 "><i>  453   </i></font></a>    * t48 * 0.5) + Omegax * dt * qLx * t2 * t23 * t25 * t29 * t48 * t50 * 0.5) +
+<a name="454"><font color="#888888 "><i>  454   </i></font></a>    Omegay * dt * qLy * t2 * t23 * t25 * t29 * t48 * t50 * 0.5) + Omegaz * dt *
+<a name="455"><font color="#888888 "><i>  455   </i></font></a>    qLz * t2 * t23 * t25 * t29 * t48 * t50 * 0.5) - Omegax * dt * qLx * t2 * t23
+<a name="456"><font color="#888888 "><i>  456   </i></font></a>    * t24 * t25 * t48 * t49) - Omegay * dt * qLy * t2 * t23 * t24 * t25 * t48 *
+<a name="457"><font color="#888888 "><i>  457   </i></font></a>    t49) - Omegaz * dt * qLz * t2 * t23 * t24 * t25 * t48 * t49);
+<a name="458"><font color="#888888 "><i>  458   </i></font></a>  t231 = t61 * t107 * t108 * 0.5 - t51 * t109 * (((((((t110 + t3 * t24 * t26 *
+<a name="459"><font color="#888888 "><i>  459   </i></font></a>    t28 * t85 * 0.5) + Omegax * dt * qLx * t3 * t23 * t25 * t29 * t50 * t85 *
+<a name="460"><font color="#888888 "><i>  460   </i></font></a>    0.5) + Omegay * dt * qLy * t3 * t23 * t25 * t29 * t50 * t85 * 0.5) + Omegaz *
+<a name="461"><font color="#888888 "><i>  461   </i></font></a>    dt * qLz * t3 * t23 * t25 * t29 * t50 * t85 * 0.5) - Omegax * dt * qLx * t3 *
+<a name="462"><font color="#888888 "><i>  462   </i></font></a>    t23 * t24 * t25 * t49 * t85) - Omegay * dt * qLy * t3 * t23 * t24 * t25 *
+<a name="463"><font color="#888888 "><i>  463   </i></font></a>    t49 * t85) - Omegaz * dt * qLz * t3 * t23 * t24 * t25 * t49 * t85);
+<a name="464"><font color="#888888 "><i>  464   </i></font></a>  t247 = t61 * t107 * t132 * 0.5 - t51 * t109 * (((((((t69 + t4 * t24 * t26 *
+<a name="465"><font color="#888888 "><i>  465   </i></font></a>    t28 * t113 * 0.5) + Omegax * dt * qLx * t4 * t23 * t25 * t29 * t50 * t113 *
+<a name="466"><font color="#888888 "><i>  466   </i></font></a>    0.5) + Omegay * dt * qLy * t4 * t23 * t25 * t29 * t50 * t113 * 0.5) + Omegaz
+<a name="467"><font color="#888888 "><i>  467   </i></font></a>    * dt * qLz * t4 * t23 * t25 * t29 * t50 * t113 * 0.5) - Omegax * dt * qLx *
+<a name="468"><font color="#888888 "><i>  468   </i></font></a>    t4 * t23 * t24 * t25 * t49 * t113) - Omegay * dt * qLy * t4 * t23 * t24 *
+<a name="469"><font color="#888888 "><i>  469   </i></font></a>    t25 * t49 * t113) - Omegaz * dt * qLz * t4 * t23 * t24 * t25 * t49 * t113);
+<a name="470"><font color="#888888 "><i>  470   </i></font></a>  t262 = t61 * t107 * t159 * 0.5 - t51 * t109 * (((((((t22 + dt * t5 * t23 * t25
+<a name="471"><font color="#888888 "><i>  471   </i></font></a>    * t29 * t12 * 0.5) + Omegax * qLx * t5 * t24 * t26 * t28 * t47 * t12 * t36 *
+<a name="472"><font color="#888888 "><i>  472   </i></font></a>    0.5) + Omegay * qLy * t5 * t24 * t26 * t28 * t47 * t12 * t36 * 0.5) + Omegaz
+<a name="473"><font color="#888888 "><i>  473   </i></font></a>    * qLz * t5 * t24 * t26 * t28 * t47 * t12 * t36 * 0.5) - Omegax * qLx * t5 *
+<a name="474"><font color="#888888 "><i>  474   </i></font></a>    t23 * t24 * t26 * t47 * t12 * t81) - Omegay * qLy * t5 * t23 * t24 * t26 *
+<a name="475"><font color="#888888 "><i>  475   </i></font></a>    t47 * t12 * t81) - Omegaz * qLz * t5 * t23 * t24 * t26 * t47 * t12 * t81);
+<a name="476"><font color="#888888 "><i>  476   </i></font></a>  t278 = t61 * t107 * t180 * 0.5 - t51 * t109 * (((((((t142 + dt * t6 * t23 *
+<a name="477"><font color="#888888 "><i>  477   </i></font></a>    t25 * t29 * t14 * 0.5) + Omegax * qLx * t6 * t24 * t26 * t28 * t47 * t36 *
+<a name="478"><font color="#888888 "><i>  478   </i></font></a>    t14 * 0.5) + Omegay * qLy * t6 * t24 * t26 * t28 * t47 * t36 * t14 * 0.5) +
+<a name="479"><font color="#888888 "><i>  479   </i></font></a>    Omegaz * qLz * t6 * t24 * t26 * t28 * t47 * t36 * t14 * 0.5) - Omegax * qLx *
+<a name="480"><font color="#888888 "><i>  480   </i></font></a>    t6 * t23 * t24 * t26 * t47 * t81 * t14) - Omegay * qLy * t6 * t23 * t24 *
+<a name="481"><font color="#888888 "><i>  481   </i></font></a>    t26 * t47 * t81 * t14) - Omegaz * qLz * t6 * t23 * t24 * t26 * t47 * t81 *
+<a name="482"><font color="#888888 "><i>  482   </i></font></a>    t14);
+<a name="483"><font color="#888888 "><i>  483   </i></font></a>  t5 = t61 * t107 * t201 * 0.5 - t51 * t109 * (((((((t82 + dt * t7 * t23 * t25 *
+<a name="484"><font color="#888888 "><i>  484   </i></font></a>    t29 * t16 * 0.5) + Omegax * qLx * t7 * t24 * t26 * t28 * t47 * t36 * t16 *
+<a name="485"><font color="#888888 "><i>  485   </i></font></a>    0.5) + Omegay * qLy * t7 * t24 * t26 * t28 * t47 * t36 * t16 * 0.5) + Omegaz
+<a name="486"><font color="#888888 "><i>  486   </i></font></a>    * qLz * t7 * t24 * t26 * t28 * t47 * t36 * t16 * 0.5) - Omegax * qLx * t7 *
+<a name="487"><font color="#888888 "><i>  487   </i></font></a>    t23 * t24 * t26 * t47 * t81 * t16) - Omegay * qLy * t7 * t23 * t24 * t26 *
+<a name="488"><font color="#888888 "><i>  488   </i></font></a>    t47 * t81 * t16) - Omegaz * qLz * t7 * t23 * t24 * t26 * t47 * t81 * t16);
+<a name="489"><font color="#888888 "><i>  489   </i></font></a>  t51 = t24 * t24;
+<a name="490"><font color="#888888 "><i>  490   </i></font></a>  t14 = t29 * t29;
+<a name="491"><font color="#888888 "><i>  491   </i></font></a>  t6 = motor1 * motor1;
+<a name="492"><font color="#888888 "><i>  492   </i></font></a>  t28 = motor2 * motor2;
+<a name="493"><font color="#888888 "><i>  493   </i></font></a>  t16 = motor3 * motor3;
+<a name="494"><font color="#888888 "><i>  494   </i></font></a>  t7 = motor4 * motor4;
+<a name="495"><font color="#888888 "><i>  495   </i></font></a>  t23 = ((k_f * t6 + k_f * t28) + k_f * t16) + k_f * t7;
+<a name="496"><font color="#888888 "><i>  496   </i></font></a>  t25 = qLx * qLx;
+<a name="497"><font color="#888888 "><i>  497   </i></font></a>  t330 = qLy * qLy;
+<a name="498"><font color="#888888 "><i>  498   </i></font></a>  t332 = qLz * qLz;
+<a name="499"><font color="#888888 "><i>  499   </i></font></a>  t20 = ((t14 + t50 * t51 * t25) + t50 * t51 * t330) + t50 * t51 * t332;
+<a name="500"><font color="#888888 "><i>  500   </i></font></a>  t335 = 1.0 / t20;
+<a name="501"><font color="#888888 "><i>  501   </i></font></a>  t12 = 1.0 / (t11 * t11);
+<a name="502"><font color="#888888 "><i>  502   </i></font></a>  t20 = 1.0 / (t20 * t20);
+<a name="503"><font color="#888888 "><i>  503   </i></font></a>  t22 = ((((((qLx * t50 * t51 * 2.0 + t2 * t24 * t29 * t48 * t49 * t25) + t2 *
+<a name="504"><font color="#888888 "><i>  504   </i></font></a>             t24 * t29 * t48 * t49 * t330) + t2 * t24 * t29 * t48 * t49 * t332)
+<a name="505"><font color="#888888 "><i>  505   </i></font></a>           - t2 * t24 * t26 * t29 * t48) - t2 * t48 * t51 * t25 * t12 * 2.0) -
+<a name="506"><font color="#888888 "><i>  506   </i></font></a>         t2 * t48 * t51 * t330 * t12 * 2.0) - t2 * t48 * t51 * t332 * t12 * 2.0;
+<a name="507"><font color="#888888 "><i>  507   </i></font></a>  t81 = 1.0 / mtot;
+<a name="508"><font color="#888888 "><i>  508   </i></font></a>  t82 = ((((((qLy * t50 * t51 * 2.0 + t3 * t24 * t29 * t49 * t85 * t25) + t3 *
+<a name="509"><font color="#888888 "><i>  509   </i></font></a>             t24 * t29 * t49 * t85 * t330) + t3 * t24 * t29 * t49 * t85 * t332)
+<a name="510"><font color="#888888 "><i>  510   </i></font></a>           - t3 * t24 * t26 * t29 * t85) - t3 * t85 * t51 * t25 * t12 * 2.0) -
+<a name="511"><font color="#888888 "><i>  511   </i></font></a>         t3 * t85 * t51 * t330 * t12 * 2.0) - t3 * t85 * t51 * t332 * t12 * 2.0;
+<a name="512"><font color="#888888 "><i>  512   </i></font></a>  t47 = ((((((qLz * t50 * t51 * 2.0 + t4 * t24 * t29 * t49 * t113 * t25) + t4 *
+<a name="513"><font color="#888888 "><i>  513   </i></font></a>             t24 * t29 * t49 * t113 * t330) + t4 * t24 * t29 * t49 * t113 * t332)
+<a name="514"><font color="#888888 "><i>  514   </i></font></a>           - t4 * t24 * t26 * t29 * t113) - t4 * t113 * t51 * t25 * t12 * 2.0) -
+<a name="515"><font color="#888888 "><i>  515   </i></font></a>         t4 * t113 * t51 * t330 * t12 * 2.0) - t4 * t113 * t51 * t332 * t12 *
+<a name="516"><font color="#888888 "><i>  516   </i></font></a>    2.0;
+<a name="517"><font color="#888888 "><i>  517   </i></font></a>  t36 = 1.0 / (mtot * mtot);
+<a name="518"><font color="#888888 "><i>  518   </i></font></a>  t41 = qLy * t50 * t51 * t23 * t335 * 2.0;
+<a name="519"><font color="#888888 "><i>  519   </i></font></a>  t46 = qLz * t50 * t51 * t23 * t335 * 2.0;
+<a name="520"><font color="#888888 "><i>  520   </i></font></a>  t56 = 1.0 / Itotxx;
+<a name="521"><font color="#888888 "><i>  521   </i></font></a>  t18 = Omegay * Omegaz * dt * t56;
+<a name="522"><font color="#888888 "><i>  522   </i></font></a>  t142 = 1.0 / Itotyy;
+<a name="523"><font color="#888888 "><i>  523   </i></font></a>  t109 = Itotyy * Omegay;
+<a name="524"><font color="#888888 "><i>  524   </i></font></a>  t107 = 1.0 / Itotzz;
+<a name="525"><font color="#888888 "><i>  525   </i></font></a>  t110 = Itotxx * Omegax;
+<a name="526"><font color="#888888 "><i>  526   </i></font></a>  t69 = Omegax * Omegay * dt * t107;
+<a name="527"><font color="#888888 "><i>  527   </i></font></a>  b_t55[0] = (t55 * t60 * t61 * 2.0 + t27 * t55 * t79 * t86) + t27 * t61 * t84 *
+<a name="528"><font color="#888888 "><i>  528   </i></font></a>    t112 * t216 * 2.0;
+<a name="529"><font color="#888888 "><i>  529   </i></font></a>  b_t55[1] = (t55 * t61 * t73 * -2.0 + t30 * t55 * t79 * t86) + t30 * t61 * t84 *
+<a name="530"><font color="#888888 "><i>  530   </i></font></a>    t112 * t216 * 2.0;
+<a name="531"><font color="#888888 "><i>  531   </i></font></a>  b_t55[2] = (t55 * t61 * t66 * -2.0 + t31 * t55 * t79 * t86) + t31 * t61 * t84 *
+<a name="532"><font color="#888888 "><i>  532   </i></font></a>    t112 * t216 * 2.0;
+<a name="533"><font color="#888888 "><i>  533   </i></font></a>  b_t55[3] = 0.0;
+<a name="534"><font color="#888888 "><i>  534   </i></font></a>  b_t55[4] = 0.0;
+<a name="535"><font color="#888888 "><i>  535   </i></font></a>  b_t55[5] = 0.0;
+<a name="536"><font color="#888888 "><i>  536   </i></font></a>  b_t55[6] = -dt * t81 * (((((((qLz * t50 * t51 * t23 * t335 * -2.0 + qLx * qLz *
+<a name="537"><font color="#888888 "><i>  537   </i></font></a>    t50 * t51 * t23 * t20 * t22 * 2.0) + qLy * t2 * t48 * t50 * t51 * t23 * t335)
+<a name="538"><font color="#888888 "><i>  538   </i></font></a>    - qLy * t2 * t48 * t50 * t14 * t23 * t335) + qLy * t24 * t26 * t29 * t23 *
+<a name="539"><font color="#888888 "><i>  539   </i></font></a>    t20 * t22 * 2.0) + qLx * qLz * t2 * t48 * t51 * t23 * t335 * t12 * 4.0) +
+<a name="540"><font color="#888888 "><i>  540   </i></font></a>    qLy * t2 * t24 * t29 * t48 * t49 * t23 * t335 * 2.0) - qLx * qLz * t2 * t24 *
+<a name="541"><font color="#888888 "><i>  541   </i></font></a>    t29 * t48 * t49 * t23 * t335 * 2.0);
+<a name="542"><font color="#888888 "><i>  542   </i></font></a>  b_t55[7] = -dt * t81 * (((((((t24 * t26 * t29 * t23 * t335 * 2.0 + qLy * qLz *
+<a name="543"><font color="#888888 "><i>  543   </i></font></a>    t50 * t51 * t23 * t20 * t22 * 2.0) - qLx * t2 * t48 * t50 * t51 * t23 * t335)
+<a name="544"><font color="#888888 "><i>  544   </i></font></a>    + qLx * t2 * t48 * t50 * t14 * t23 * t335) - qLx * t24 * t26 * t29 * t23 *
+<a name="545"><font color="#888888 "><i>  545   </i></font></a>    t20 * t22 * 2.0) + qLy * qLz * t2 * t48 * t51 * t23 * t335 * t12 * 4.0) -
+<a name="546"><font color="#888888 "><i>  546   </i></font></a>    qLx * t2 * t24 * t29 * t48 * t49 * t23 * t335 * 2.0) - qLy * qLz * t2 * t24 *
+<a name="547"><font color="#888888 "><i>  547   </i></font></a>    t29 * t48 * t49 * t23 * t335 * 2.0);
+<a name="548"><font color="#888888 "><i>  548   </i></font></a>  b_t55[8] = -dt * t81 * (((((((((((t14 * t23 * t20 * t22 + qLx * t50 * t51 *
+<a name="549"><font color="#888888 "><i>  549   </i></font></a>    t23 * t335 * 2.0) - t50 * t51 * t23 * t25 * t20 * t22) - t50 * t51 * t23 *
+<a name="550"><font color="#888888 "><i>  550   </i></font></a>    t330 * t20 * t22) + t50 * t51 * t23 * t332 * t20 * t22) + t2 * t24 * t26 *
+<a name="551"><font color="#888888 "><i>  551   </i></font></a>    t29 * t48 * t23 * t335) - t2 * t48 * t51 * t23 * t25 * t335 * t12 * 2.0) -
+<a name="552"><font color="#888888 "><i>  552   </i></font></a>    t2 * t48 * t51 * t23 * t330 * t335 * t12 * 2.0) + t2 * t48 * t51 * t23 *
+<a name="553"><font color="#888888 "><i>  553   </i></font></a>    t332 * t335 * t12 * 2.0) + t2 * t24 * t29 * t48 * t49 * t23 * t25 * t335) +
+<a name="554"><font color="#888888 "><i>  554   </i></font></a>    t2 * t24 * t29 * t48 * t49 * t23 * t330 * t335) - t2 * t24 * t29 * t48 * t49
+<a name="555"><font color="#888888 "><i>  555   </i></font></a>    * t23 * t332 * t335);
+<a name="556"><font color="#888888 "><i>  556   </i></font></a>  memset(&amp;b_t55[9], 0, 21U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="557"><font color="#888888 "><i>  557   </i></font></a>  b_t55[30] = (t55 * t61 * t91 * 2.0 - t27 * t55 * t86 * t108) - t27 * t61 * t84
+<a name="558"><font color="#888888 "><i>  558   </i></font></a>    * t112 * t231 * 2.0;
+<a name="559"><font color="#888888 "><i>  559   </i></font></a>  b_t55[31] = (t55 * t61 * t105 * 2.0 - t30 * t55 * t86 * t108) - t30 * t61 *
+<a name="560"><font color="#888888 "><i>  560   </i></font></a>    t84 * t112 * t231 * 2.0;
+<a name="561"><font color="#888888 "><i>  561   </i></font></a>  b_t55[32] = (t55 * t61 * t96 * -2.0 - t31 * t55 * t86 * t108) - t31 * t61 *
+<a name="562"><font color="#888888 "><i>  562   </i></font></a>    t84 * t112 * t231 * 2.0;
+<a name="563"><font color="#888888 "><i>  563   </i></font></a>  b_t55[33] = 0.0;
+<a name="564"><font color="#888888 "><i>  564   </i></font></a>  b_t55[34] = 0.0;
+<a name="565"><font color="#888888 "><i>  565   </i></font></a>  b_t55[35] = 0.0;
+<a name="566"><font color="#888888 "><i>  566   </i></font></a>  b_t55[36] = -dt * t81 * (((((((t24 * t26 * t29 * t23 * t335 * -2.0 + qLx * qLz
+<a name="567"><font color="#888888 "><i>  567   </i></font></a>    * t50 * t51 * t23 * t20 * t82 * 2.0) + qLy * t24 * t26 * t29 * t23 * t20 *
+<a name="568"><font color="#888888 "><i>  568   </i></font></a>    t82 * 2.0) + qLy * t3 * t50 * t85 * t51 * t23 * t335) - qLy * t3 * t50 * t85
+<a name="569"><font color="#888888 "><i>  569   </i></font></a>    * t14 * t23 * t335) + qLx * qLz * t3 * t85 * t51 * t23 * t335 * t12 * 4.0) +
+<a name="570"><font color="#888888 "><i>  570   </i></font></a>    qLy * t3 * t24 * t29 * t49 * t85 * t23 * t335 * 2.0) - qLx * qLz * t3 * t24 *
+<a name="571"><font color="#888888 "><i>  571   </i></font></a>    t29 * t49 * t85 * t23 * t335 * 2.0);
+<a name="572"><font color="#888888 "><i>  572   </i></font></a>  b_t55[37] = dt * t81 * (((((((t46 - qLy * qLz * t50 * t51 * t23 * t20 * t82 *
+<a name="573"><font color="#888888 "><i>  573   </i></font></a>    2.0) + qLx * t24 * t26 * t29 * t23 * t20 * t82 * 2.0) + qLx * t3 * t50 * t85
+<a name="574"><font color="#888888 "><i>  574   </i></font></a>    * t51 * t23 * t335) - qLx * t3 * t50 * t85 * t14 * t23 * t335) - qLy * qLz *
+<a name="575"><font color="#888888 "><i>  575   </i></font></a>    t3 * t85 * t51 * t23 * t335 * t12 * 4.0) + qLx * t3 * t24 * t29 * t49 * t85 *
+<a name="576"><font color="#888888 "><i>  576   </i></font></a>    t23 * t335 * 2.0) + qLy * qLz * t3 * t24 * t29 * t49 * t85 * t23 * t335 *
+<a name="577"><font color="#888888 "><i>  577   </i></font></a>    2.0);
+<a name="578"><font color="#888888 "><i>  578   </i></font></a>  b_t55[38] = -dt * t81 * (((((((((((t41 + t14 * t23 * t20 * t82) - t50 * t51 *
+<a name="579"><font color="#888888 "><i>  579   </i></font></a>    t23 * t25 * t20 * t82) - t50 * t51 * t23 * t330 * t20 * t82) + t50 * t51 *
+<a name="580"><font color="#888888 "><i>  580   </i></font></a>    t23 * t332 * t20 * t82) + t3 * t24 * t26 * t29 * t85 * t23 * t335) - t3 *
+<a name="581"><font color="#888888 "><i>  581   </i></font></a>    t85 * t51 * t23 * t25 * t335 * t12 * 2.0) - t3 * t85 * t51 * t23 * t330 *
+<a name="582"><font color="#888888 "><i>  582   </i></font></a>    t335 * t12 * 2.0) + t3 * t85 * t51 * t23 * t332 * t335 * t12 * 2.0) + t3 *
+<a name="583"><font color="#888888 "><i>  583   </i></font></a>    t24 * t29 * t49 * t85 * t23 * t25 * t335) + t3 * t24 * t29 * t49 * t85 * t23
+<a name="584"><font color="#888888 "><i>  584   </i></font></a>    * t330 * t335) - t3 * t24 * t29 * t49 * t85 * t23 * t332 * t335);
+<a name="585"><font color="#888888 "><i>  585   </i></font></a>  memset(&amp;b_t55[39], 0, 21U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="586"><font color="#888888 "><i>  586   </i></font></a>  b_t55[60] = (t55 * t61 * t118 * -2.0 - t27 * t55 * t86 * t132) - t27 * t61 *
+<a name="587"><font color="#888888 "><i>  587   </i></font></a>    t84 * t112 * t247 * 2.0;
+<a name="588"><font color="#888888 "><i>  588   </i></font></a>  b_t55[61] = (t55 * t61 * (((((((t87 + t119) + t120) + t121) - t232) - t233) -
+<a name="589"><font color="#888888 "><i>  589   </i></font></a>    t234) - t235) * 2.0 - t30 * t55 * t86 * t132) - t30 * t61 * t84 * t112 *
+<a name="590"><font color="#888888 "><i>  590   </i></font></a>    t247 * 2.0;
+<a name="591"><font color="#888888 "><i>  591   </i></font></a>  b_t55[62] = (t55 * t61 * t130 * 2.0 - t31 * t55 * t86 * t132) - t31 * t61 *
+<a name="592"><font color="#888888 "><i>  592   </i></font></a>    t84 * t112 * t247 * 2.0;
+<a name="593"><font color="#888888 "><i>  593   </i></font></a>  b_t55[63] = 0.0;
+<a name="594"><font color="#888888 "><i>  594   </i></font></a>  b_t55[64] = 0.0;
+<a name="595"><font color="#888888 "><i>  595   </i></font></a>  b_t55[65] = 0.0;
+<a name="596"><font color="#888888 "><i>  596   </i></font></a>  b_t55[66] = -dt * t81 * (((((((qLx * t50 * t51 * t23 * t335 * -2.0 + qLx * qLz
+<a name="597"><font color="#888888 "><i>  597   </i></font></a>    * t50 * t51 * t23 * t20 * t47 * 2.0) + qLy * t24 * t26 * t29 * t23 * t20 *
+<a name="598"><font color="#888888 "><i>  598   </i></font></a>    t47 * 2.0) + qLy * t4 * t50 * t113 * t51 * t23 * t335) - qLy * t4 * t50 *
+<a name="599"><font color="#888888 "><i>  599   </i></font></a>    t113 * t14 * t23 * t335) + qLx * qLz * t4 * t113 * t51 * t23 * t335 * t12 *
+<a name="600"><font color="#888888 "><i>  600   </i></font></a>    4.0) + qLy * t4 * t24 * t29 * t49 * t113 * t23 * t335 * 2.0) - qLx * qLz *
+<a name="601"><font color="#888888 "><i>  601   </i></font></a>    t4 * t24 * t29 * t49 * t113 * t23 * t335 * 2.0);
+<a name="602"><font color="#888888 "><i>  602   </i></font></a>  b_t55[67] = dt * t81 * (((((((t41 - qLy * qLz * t50 * t51 * t23 * t20 * t47 *
+<a name="603"><font color="#888888 "><i>  603   </i></font></a>    2.0) + qLx * t24 * t26 * t29 * t23 * t20 * t47 * 2.0) + qLx * t4 * t50 *
+<a name="604"><font color="#888888 "><i>  604   </i></font></a>    t113 * t51 * t23 * t335) - qLx * t4 * t50 * t113 * t14 * t23 * t335) - qLy *
+<a name="605"><font color="#888888 "><i>  605   </i></font></a>    qLz * t4 * t113 * t51 * t23 * t335 * t12 * 4.0) + qLx * t4 * t24 * t29 * t49
+<a name="606"><font color="#888888 "><i>  606   </i></font></a>    * t113 * t23 * t335 * 2.0) + qLy * qLz * t4 * t24 * t29 * t49 * t113 * t23 *
+<a name="607"><font color="#888888 "><i>  607   </i></font></a>    t335 * 2.0);
+<a name="608"><font color="#888888 "><i>  608   </i></font></a>  b_t55[68] = dt * t81 * (((((((((((t46 - t14 * t23 * t20 * t47) + t50 * t51 *
+<a name="609"><font color="#888888 "><i>  609   </i></font></a>    t23 * t25 * t20 * t47) + t50 * t51 * t23 * t330 * t20 * t47) - t50 * t51 *
+<a name="610"><font color="#888888 "><i>  610   </i></font></a>    t23 * t332 * t20 * t47) - t4 * t24 * t26 * t29 * t113 * t23 * t335) + t4 *
+<a name="611"><font color="#888888 "><i>  611   </i></font></a>    t113 * t51 * t23 * t25 * t335 * t12 * 2.0) + t4 * t113 * t51 * t23 * t330 *
+<a name="612"><font color="#888888 "><i>  612   </i></font></a>    t335 * t12 * 2.0) - t4 * t113 * t51 * t23 * t332 * t335 * t12 * 2.0) - t4 *
+<a name="613"><font color="#888888 "><i>  613   </i></font></a>    t24 * t29 * t49 * t113 * t23 * t25 * t335) - t4 * t24 * t29 * t49 * t113 *
+<a name="614"><font color="#888888 "><i>  614   </i></font></a>    t23 * t330 * t335) + t4 * t24 * t29 * t49 * t113 * t23 * t332 * t335);
+<a name="615"><font color="#888888 "><i>  615   </i></font></a>  memset(&amp;b_t55[69], 0, 24U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="616"><font color="#888888 "><i>  616   </i></font></a>  b_t55[93] = 1.0;
+<a name="617"><font color="#888888 "><i>  617   </i></font></a>  memset(&amp;b_t55[94], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="618"><font color="#888888 "><i>  618   </i></font></a>  b_t55[124] = 1.0;
+<a name="619"><font color="#888888 "><i>  619   </i></font></a>  memset(&amp;b_t55[125], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="620"><font color="#888888 "><i>  620   </i></font></a>  b_t55[155] = 1.0;
+<a name="621"><font color="#888888 "><i>  621   </i></font></a>  memset(&amp;b_t55[156], 0, 27U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="622"><font color="#888888 "><i>  622   </i></font></a>  b_t55[183] = dt;
+<a name="623"><font color="#888888 "><i>  623   </i></font></a>  b_t55[184] = 0.0;
+<a name="624"><font color="#888888 "><i>  624   </i></font></a>  b_t55[185] = 0.0;
+<a name="625"><font color="#888888 "><i>  625   </i></font></a>  b_t55[186] = 1.0;
+<a name="626"><font color="#888888 "><i>  626   </i></font></a>  memset(&amp;b_t55[187], 0, 27U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="627"><font color="#888888 "><i>  627   </i></font></a>  b_t55[214] = dt;
+<a name="628"><font color="#888888 "><i>  628   </i></font></a>  b_t55[215] = 0.0;
+<a name="629"><font color="#888888 "><i>  629   </i></font></a>  b_t55[216] = 0.0;
+<a name="630"><font color="#888888 "><i>  630   </i></font></a>  b_t55[217] = 1.0;
+<a name="631"><font color="#888888 "><i>  631   </i></font></a>  memset(&amp;b_t55[218], 0, 27U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="632"><font color="#888888 "><i>  632   </i></font></a>  b_t55[245] = dt;
+<a name="633"><font color="#888888 "><i>  633   </i></font></a>  b_t55[246] = 0.0;
+<a name="634"><font color="#888888 "><i>  634   </i></font></a>  b_t55[247] = 0.0;
+<a name="635"><font color="#888888 "><i>  635   </i></font></a>  b_t55[248] = 1.0;
+<a name="636"><font color="#888888 "><i>  636   </i></font></a>  memset(&amp;b_t55[249], 0, 21U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="637"><font color="#888888 "><i>  637   </i></font></a>  b_t55[270] = (t55 * t61 * t141 * 2.0 - t27 * t55 * t86 * t159) - t27 * t61 *
+<a name="638"><font color="#888888 "><i>  638   </i></font></a>    t84 * t112 * t262 * 2.0;
+<a name="639"><font color="#888888 "><i>  639   </i></font></a>  b_t55[271] = (t55 * t61 * t152 * 2.0 - t30 * t55 * t86 * t159) - t30 * t61 *
+<a name="640"><font color="#888888 "><i>  640   </i></font></a>    t84 * t112 * t262 * 2.0;
+<a name="641"><font color="#888888 "><i>  641   </i></font></a>  b_t55[272] = (t55 * t61 * t147 * -2.0 - t31 * t55 * t86 * t159) - t31 * t61 *
+<a name="642"><font color="#888888 "><i>  642   </i></font></a>    t84 * t112 * t262 * 2.0;
+<a name="643"><font color="#888888 "><i>  643   </i></font></a>  b_t55[273] = 0.0;
+<a name="644"><font color="#888888 "><i>  644   </i></font></a>  b_t55[274] = 0.0;
+<a name="645"><font color="#888888 "><i>  645   </i></font></a>  b_t55[275] = 0.0;
+<a name="646"><font color="#888888 "><i>  646   </i></font></a>  b_t55[276] = 0.0;
+<a name="647"><font color="#888888 "><i>  647   </i></font></a>  b_t55[277] = 0.0;
+<a name="648"><font color="#888888 "><i>  648   </i></font></a>  b_t55[278] = 0.0;
+<a name="649"><font color="#888888 "><i>  649   </i></font></a>  b_t55[279] = 1.0;
+<a name="650"><font color="#888888 "><i>  650   </i></font></a>  b_t55[280] = -dt * t142 * (Itotxx * Omegaz - Itotzz * Omegaz);
+<a name="651"><font color="#888888 "><i>  651   </i></font></a>  b_t55[281] = -dt * t107 * (t109 - Itotxx * Omegay);
+<a name="652"><font color="#888888 "><i>  652   </i></font></a>  memset(&amp;b_t55[282], 0, 18U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="653"><font color="#888888 "><i>  653   </i></font></a>  b_t55[300] = (t55 * t61 * t166 * -2.0 - t27 * t55 * t86 * t180) - t27 * t61 *
+<a name="654"><font color="#888888 "><i>  654   </i></font></a>    t84 * t112 * t278 * 2.0;
+<a name="655"><font color="#888888 "><i>  655   </i></font></a>  b_t55[301] = (t55 * t61 * t178 * 2.0 - t30 * t55 * t86 * t180) - t30 * t61 *
+<a name="656"><font color="#888888 "><i>  656   </i></font></a>    t84 * t112 * t278 * 2.0;
+<a name="657"><font color="#888888 "><i>  657   </i></font></a>  b_t55[302] = (t55 * t61 * t170 * 2.0 - t31 * t55 * t86 * t180) - t31 * t61 *
+<a name="658"><font color="#888888 "><i>  658   </i></font></a>    t84 * t112 * t278 * 2.0;
+<a name="659"><font color="#888888 "><i>  659   </i></font></a>  b_t55[303] = 0.0;
+<a name="660"><font color="#888888 "><i>  660   </i></font></a>  b_t55[304] = 0.0;
+<a name="661"><font color="#888888 "><i>  661   </i></font></a>  b_t55[305] = 0.0;
+<a name="662"><font color="#888888 "><i>  662   </i></font></a>  b_t55[306] = 0.0;
+<a name="663"><font color="#888888 "><i>  663   </i></font></a>  b_t55[307] = 0.0;
+<a name="664"><font color="#888888 "><i>  664   </i></font></a>  b_t55[308] = 0.0;
+<a name="665"><font color="#888888 "><i>  665   </i></font></a>  b_t55[309] = dt * t56 * (Itotyy * Omegaz - Itotzz * Omegaz);
+<a name="666"><font color="#888888 "><i>  666   </i></font></a>  b_t55[310] = 1.0;
+<a name="667"><font color="#888888 "><i>  667   </i></font></a>  b_t55[311] = dt * t107 * (t110 - Itotyy * Omegax);
+<a name="668"><font color="#888888 "><i>  668   </i></font></a>  memset(&amp;b_t55[312], 0, 18U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="669"><font color="#888888 "><i>  669   </i></font></a>  b_t55[330] = (t55 * t61 * t185 * 2.0 - t27 * t55 * t86 * t201) - t27 * t61 *
+<a name="670"><font color="#888888 "><i>  670   </i></font></a>    t84 * t112 * t5 * 2.0;
+<a name="671"><font color="#888888 "><i>  671   </i></font></a>  b_t55[331] = (t55 * t61 * t190 * -2.0 - t30 * t55 * t86 * t201) - t30 * t61 *
+<a name="672"><font color="#888888 "><i>  672   </i></font></a>    t84 * t112 * t5 * 2.0;
+<a name="673"><font color="#888888 "><i>  673   </i></font></a>  b_t55[332] = (t55 * t61 * t199 * 2.0 - t31 * t55 * t86 * t201) - t31 * t61 *
+<a name="674"><font color="#888888 "><i>  674   </i></font></a>    t84 * t112 * t5 * 2.0;
+<a name="675"><font color="#888888 "><i>  675   </i></font></a>  b_t55[333] = 0.0;
+<a name="676"><font color="#888888 "><i>  676   </i></font></a>  b_t55[334] = 0.0;
+<a name="677"><font color="#888888 "><i>  677   </i></font></a>  b_t55[335] = 0.0;
+<a name="678"><font color="#888888 "><i>  678   </i></font></a>  b_t55[336] = 0.0;
+<a name="679"><font color="#888888 "><i>  679   </i></font></a>  b_t55[337] = 0.0;
+<a name="680"><font color="#888888 "><i>  680   </i></font></a>  b_t55[338] = 0.0;
+<a name="681"><font color="#888888 "><i>  681   </i></font></a>  b_t55[339] = dt * t56 * (t109 - Itotzz * Omegay);
+<a name="682"><font color="#888888 "><i>  682   </i></font></a>  b_t55[340] = -dt * t142 * (t110 - Itotzz * Omegax);
+<a name="683"><font color="#888888 "><i>  683   </i></font></a>  b_t55[341] = 1.0;
+<a name="684"><font color="#888888 "><i>  684   </i></font></a>  memset(&amp;b_t55[342], 0, 24U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="685"><font color="#888888 "><i>  685   </i></font></a>  b_t55[366] = -dt * t36 * (qLx * qLz * t50 * t51 * t23 * t335 * 2.0 + qLy * t24
+<a name="686"><font color="#888888 "><i>  686   </i></font></a>    * t26 * t29 * t23 * t335 * 2.0);
+<a name="687"><font color="#888888 "><i>  687   </i></font></a>  b_t55[367] = -dt * t36 * (qLy * qLz * t50 * t51 * t23 * t335 * 2.0 - qLx * t24
+<a name="688"><font color="#888888 "><i>  688   </i></font></a>    * t26 * t29 * t23 * t335 * 2.0);
+<a name="689"><font color="#888888 "><i>  689   </i></font></a>  b_t55[368] = -dt * t36 * (((t14 * t23 * t335 - t50 * t51 * t23 * t25 * t335) -
+<a name="690"><font color="#888888 "><i>  690   </i></font></a>    t50 * t51 * t23 * t330 * t335) + t50 * t51 * t23 * t332 * t335);
+<a name="691"><font color="#888888 "><i>  691   </i></font></a>  b_t55[369] = 0.0;
+<a name="692"><font color="#888888 "><i>  692   </i></font></a>  b_t55[370] = 0.0;
+<a name="693"><font color="#888888 "><i>  693   </i></font></a>  b_t55[371] = 0.0;
+<a name="694"><font color="#888888 "><i>  694   </i></font></a>  b_t55[372] = 1.0;
+<a name="695"><font color="#888888 "><i>  695   </i></font></a>  memset(&amp;b_t55[373], 0, 26U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="696"><font color="#888888 "><i>  696   </i></font></a>  b_t55[399] = 1.0 / (Itotxx * Itotxx) * dt * (((((((((-Itotyy * Omegay * Omegaz
+<a name="697"><font color="#888888 "><i>  697   </i></font></a>    + Itotzz * Omegay * Omegaz) + k_f * t6 * t_GeomCogY) + k_f * t28 *
+<a name="698"><font color="#888888 "><i>  698   </i></font></a>    t_GeomCogY) + k_f * t16 * t_GeomCogY) + k_f * t7 * t_GeomCogY) - k_f * t6 *
+<a name="699"><font color="#888888 "><i>  699   </i></font></a>    w) - k_f * t28 * w) + k_f * t16 * w) + k_f * t7 * w);
+<a name="700"><font color="#888888 "><i>  700   </i></font></a>  b_t55[400] = -Omegax * Omegaz * dt * t142;
+<a name="701"><font color="#888888 "><i>  701   </i></font></a>  b_t55[401] = t69;
+<a name="702"><font color="#888888 "><i>  702   </i></font></a>  b_t55[402] = 0.0;
+<a name="703"><font color="#888888 "><i>  703   </i></font></a>  b_t55[403] = 1.0;
+<a name="704"><font color="#888888 "><i>  704   </i></font></a>  memset(&amp;b_t55[404], 0, 25U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="705"><font color="#888888 "><i>  705   </i></font></a>  b_t55[429] = t18;
+<a name="706"><font color="#888888 "><i>  706   </i></font></a>  b_t55[430] = -1.0 / (Itotyy * Itotyy) * dt * (((((((((-Itotxx * Omegax *
+<a name="707"><font color="#888888 "><i>  707   </i></font></a>    Omegaz + Itotzz * Omegax * Omegaz) - k_f * l * t6) + k_f * l * t28) + k_f *
+<a name="708"><font color="#888888 "><i>  708   </i></font></a>    l * t16) - k_f * l * t7) + k_f * t6 * t_GeomCogX) + k_f * t28 * t_GeomCogX)
+<a name="709"><font color="#888888 "><i>  709   </i></font></a>    + k_f * t16 * t_GeomCogX) + k_f * t7 * t_GeomCogX);
+<a name="710"><font color="#888888 "><i>  710   </i></font></a>  b_t55[431] = -t69;
+<a name="711"><font color="#888888 "><i>  711   </i></font></a>  b_t55[432] = 0.0;
+<a name="712"><font color="#888888 "><i>  712   </i></font></a>  b_t55[433] = 0.0;
+<a name="713"><font color="#888888 "><i>  713   </i></font></a>  b_t55[434] = 1.0;
+<a name="714"><font color="#888888 "><i>  714   </i></font></a>  memset(&amp;b_t55[435], 0, 24U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="715"><font color="#888888 "><i>  715   </i></font></a>  b_t55[459] = -t18;
+<a name="716"><font color="#888888 "><i>  716   </i></font></a>  b_t55[460] = Omegax * Omegaz * dt * t142;
+<a name="717"><font color="#888888 "><i>  717   </i></font></a>  b_t55[461] = -1.0 / (Itotzz * Itotzz) * dt * (((((Itotxx * Omegax * Omegay -
+<a name="718"><font color="#888888 "><i>  718   </i></font></a>    Itotyy * Omegax * Omegay) + c * k_f * t6) - c * k_f * t28) + c * k_f * t16)
+<a name="719"><font color="#888888 "><i>  719   </i></font></a>    - c * k_f * t7);
+<a name="720"><font color="#888888 "><i>  720   </i></font></a>  b_t55[462] = 0.0;
+<a name="721"><font color="#888888 "><i>  721   </i></font></a>  b_t55[463] = 0.0;
+<a name="722"><font color="#888888 "><i>  722   </i></font></a>  b_t55[464] = 0.0;
+<a name="723"><font color="#888888 "><i>  723   </i></font></a>  b_t55[465] = 1.0;
+<a name="724"><font color="#888888 "><i>  724   </i></font></a>  memset(&amp;b_t55[466], 0, 24U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="725"><font color="#888888 "><i>  725   </i></font></a>  b_t55[490] = dt * t23 * t142;
+<a name="726"><font color="#888888 "><i>  726   </i></font></a>  b_t55[491] = 0.0;
+<a name="727"><font color="#888888 "><i>  727   </i></font></a>  b_t55[492] = 0.0;
+<a name="728"><font color="#888888 "><i>  728   </i></font></a>  b_t55[493] = 0.0;
+<a name="729"><font color="#888888 "><i>  729   </i></font></a>  b_t55[494] = 0.0;
+<a name="730"><font color="#888888 "><i>  730   </i></font></a>  b_t55[495] = 0.0;
+<a name="731"><font color="#888888 "><i>  731   </i></font></a>  b_t55[496] = 1.0;
+<a name="732"><font color="#888888 "><i>  732   </i></font></a>  memset(&amp;b_t55[497], 0, 22U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="733"><font color="#888888 "><i>  733   </i></font></a>  b_t55[519] = -dt * t23 * t56;
+<a name="734"><font color="#888888 "><i>  734   </i></font></a>  b_t55[520] = 0.0;
+<a name="735"><font color="#888888 "><i>  735   </i></font></a>  b_t55[521] = 0.0;
+<a name="736"><font color="#888888 "><i>  736   </i></font></a>  b_t55[522] = 0.0;
+<a name="737"><font color="#888888 "><i>  737   </i></font></a>  b_t55[523] = 0.0;
+<a name="738"><font color="#888888 "><i>  738   </i></font></a>  b_t55[524] = 0.0;
+<a name="739"><font color="#888888 "><i>  739   </i></font></a>  b_t55[525] = 0.0;
+<a name="740"><font color="#888888 "><i>  740   </i></font></a>  b_t55[526] = 0.0;
+<a name="741"><font color="#888888 "><i>  741   </i></font></a>  b_t55[527] = 1.0;
+<a name="742"><font color="#888888 "><i>  742   </i></font></a>  memset(&amp;b_t55[528], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="743"><font color="#888888 "><i>  743   </i></font></a>  b_t55[558] = 1.0;
+<a name="744"><font color="#888888 "><i>  744   </i></font></a>  memset(&amp;b_t55[559], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="745"><font color="#888888 "><i>  745   </i></font></a>  b_t55[589] = 1.0;
+<a name="746"><font color="#888888 "><i>  746   </i></font></a>  memset(&amp;b_t55[590], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="747"><font color="#888888 "><i>  747   </i></font></a>  b_t55[620] = 1.0;
+<a name="748"><font color="#888888 "><i>  748   </i></font></a>  memset(&amp;b_t55[621], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="749"><font color="#888888 "><i>  749   </i></font></a>  b_t55[651] = 1.0;
+<a name="750"><font color="#888888 "><i>  750   </i></font></a>  memset(&amp;b_t55[652], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="751"><font color="#888888 "><i>  751   </i></font></a>  b_t55[682] = 1.0;
+<a name="752"><font color="#888888 "><i>  752   </i></font></a>  memset(&amp;b_t55[683], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="753"><font color="#888888 "><i>  753   </i></font></a>  b_t55[713] = 1.0;
+<a name="754"><font color="#888888 "><i>  754   </i></font></a>  memset(&amp;b_t55[714], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="755"><font color="#888888 "><i>  755   </i></font></a>  b_t55[744] = 1.0;
+<a name="756"><font color="#888888 "><i>  756   </i></font></a>  memset(&amp;b_t55[745], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="757"><font color="#888888 "><i>  757   </i></font></a>  b_t55[775] = 1.0;
+<a name="758"><font color="#888888 "><i>  758   </i></font></a>  memset(&amp;b_t55[776], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="759"><font color="#888888 "><i>  759   </i></font></a>  b_t55[806] = 1.0;
+<a name="760"><font color="#888888 "><i>  760   </i></font></a>  memset(&amp;b_t55[807], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="761"><font color="#888888 "><i>  761   </i></font></a>  b_t55[837] = 1.0;
+<a name="762"><font color="#888888 "><i>  762   </i></font></a>  memset(&amp;b_t55[838], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="763"><font color="#888888 "><i>  763   </i></font></a>  b_t55[868] = 1.0;
+<a name="764"><font color="#888888 "><i>  764   </i></font></a>  memset(&amp;b_t55[869], 0, 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="765"><font color="#888888 "><i>  765   </i></font></a>  b_t55[899] = 1.0;
+<a name="766"><font color="#888888 "><i>  766   </i></font></a>  <font color="#112266"><b>for</b></font> (i0 = 0; i0 &lt; 30; i0++) <b>{</b>
+<a name="767"><font color="#888888 "><i>  767   </i></font></a>    memcpy(&amp;F[i0 * 30], &amp;b_t55[i0 * 30], 30U * <font color="#112266"><b>sizeof</b></font>(<font color="#112266"><b>double</b></font>));
+<a name="768"><font color="#888888 "><i>  768   </i></font></a>  <b>}</b>
+<a name="769"><font color="#888888 "><i>  769   </i></font></a><b>}</b>
+<a name="770"><font color="#888888 "><i>  770   </i></font></a>
+<a name="771"><font color="#888888 "><i>  771   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="772"><font color="#888888 "><i>  772   </i></font></a><font color="#117755"><i>// File trailer for calc_EKF_F_optimized.cpp</i></font>
+<a name="773"><font color="#888888 "><i>  773   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="774"><font color="#888888 "><i>  774   </i></font></a><font color="#117755"><i>// [EOF]</i></font>
+<a name="775"><font color="#888888 "><i>  775   </i></font></a><font color="#117755"><i>//</i></font>
+<a name="776"><font color="#888888 "><i>  776   </i></font></a></pre>
+</td></tr></table>
+</p>
+</body>
+</html>
