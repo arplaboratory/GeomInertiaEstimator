@@ -3,7 +3,7 @@ a nonlinear Kalman Filter based ROS package that allows to estimate inertia and 
 
 By combining rotor speed measurements with data from an Inertial Measurement Unit (IMU) and any kind of pose sensor, an Unscented Kalman Filter (UKF) or Extended Kalman Filter (EKF) estimates inertia parameters (mass, moment of inertia, position of center of mass) and geometric parameters (position of IMU, position of pose sensor).
 
-  <img src="https://raw.githubusercontent.com/arplaboratory/GeomInertiaEstimator/master/Multirotor.svg?sanitize=true" width="100%" height="140">
+  <img src="https://raw.githubusercontent.com/arplaboratory/GeomInertiaEstimator/master/config/Multirotor.svg?sanitize=true" width="100%" height="140">
   
 <!--video -->
 
