@@ -1,9 +1,9 @@
 #include <ros/ros.h>
-#include "inertia_estimator.h"
+#include "geom_inertia_estimator.h"
 
 int main(int argc, char *argv[]) {
 
-  ros::init(argc, argv, "inertia_estimator");
+  ros::init(argc, argv, "geom_inertia_estimator");
   ros::NodeHandle nh("~");
   //getchar();
 
@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   estimator.sub_odom_ = nh.subscribe("odom",        10,&InertiaEstimator::pose_callback,&estimator);
   estimator.sub_imu_  = nh.subscribe("imu",         10,&InertiaEstimator::imu_callback,&estimator);
 
-  estimator.pub_estimates_ = nh.advertise<inertia_estimator::ParameterEstimates>("param_estimates", 10);
+  estimator.pub_estimates_ = nh.advertise<geom_inertia_estimator::ParameterEstimates>("param_estimates", 10);
 
   ros::spin();
 

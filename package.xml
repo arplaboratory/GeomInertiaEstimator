@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>inertia_estimator</name>
+    <name>geom_inertia_estimator</name>
     <version>0.0.1</version>
     <description>Inertia Estimator for Multirotors</description>
 

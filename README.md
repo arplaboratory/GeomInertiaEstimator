@@ -57,7 +57,7 @@ git clone git@github.com:arplaboratory/GeomInertiaEstimator.git
 
 Build the _GeomInertiaEstimator_ package:
 ```
-catkin_make --pkg inertia_estimator --cmake-args -DCMAKE_BUILD_TYPE=Release
+catkin_make --pkg geom_inertia_estimator --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
 In case an error message appears, try running the last step again.
@@ -65,5 +65,5 @@ In case an error message appears, try running the last step again.
 ## Usage
 To launch the estimator package, execute:
 ```
-roslaunch inertia_estimator estimator.launch
+roslaunch geom_inertia_estimator estimator.launch
 ```
