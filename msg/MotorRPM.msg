@@ -1,2 +1,2 @@
 Header header
-uint8[4] rpm
+uint32[4] rpm

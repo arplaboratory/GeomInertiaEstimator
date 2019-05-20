@@ -4,7 +4,7 @@
 #include <Eigen/Eigen>
 #include <ros/ros.h>
 #include <sensor_msgs/Imu.h>
-#include <nav_msgs/Odometry.h>
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <geom_inertia_estimator/MotorRPM.h>
@@ -176,9 +176,9 @@ public:
                   sub_odom_,
                   sub_rpm_;
   ros::Publisher pub_estimates_;
-//  void rpm_callback (const quadrotor_msgs::MotorRPM::ConstPtr &msg);
-  void rpm_callback (const geometry_msgs::WrenchStamped::ConstPtr &msg);
-  void pose_callback (const nav_msgs::Odometry::ConstPtr &msg);
+  void rpm_callback (const geom_inertia_estimator::MotorRPM::ConstPtr &msg);
+  //void rpm_callback (const geometry_msgs::WrenchStamped::ConstPtr &msg);
+  void pose_callback (const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
   void imu_callback (const sensor_msgs::Imu::ConstPtr &msg);
 
 private:
@@ -215,9 +215,8 @@ private:
   void calculateMeanStateSigma(State &mean, const State sigmaPoints[NUM_SIGMAS]);
 
   // subscirber functions: messge conversion functions
-  // Input rpmMsg2input(const quadrotor_msgs::MotorRPM::ConstPtr &msg);
-  void rpmMsg2input(Input &returnVar, const geometry_msgs::WrenchStamped::ConstPtr &msg);
-  MeasPose poseMsg2measPose(const nav_msgs::Odometry::ConstPtr &msg);
+  void rpmMsg2input(Input &returnVar, const geom_inertia_estimator::MotorRPM::ConstPtr &msg);
+  MeasPose poseMsg2measPose(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg);
   MeasImu imuMsg2measImu(const sensor_msgs::Imu::ConstPtr &msg);
 
   // publisher function

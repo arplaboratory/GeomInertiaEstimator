@@ -1,6 +1,7 @@
 <launch>
     <arg name="use_EKF" default="0"/>
-    <arg name="model" default="QuadrotorQc15"/>
+    <arg name="model" default="quadrotor"/>
+
     <group ns="$(arg model)">
         <node pkg="geom_inertia_estimator"
             type="geom_inertia_estimator"
@@ -8,9 +9,9 @@
             output="screen">
             <rosparam file="$(find geom_inertia_estimator)/config/quad_params.yaml"/>
             <param name="useEKF" value="$(arg use_EKF)"/>
-            <remap from="~odom" to="odom"/>
+            <remap from="~pose" to="pose"/>
             <remap from="~imu" to="imu"/>
-            <remap from="~meas_rpm" to="meas_rpm"/>
+            <remap from="~rpm" to="rpm"/>
         </node>
     </group>
 </launch>

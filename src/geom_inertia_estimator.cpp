@@ -567,9 +567,7 @@ void InertiaEstimator::calculateMeanStateSigma(State &mean, const State sigmaPoi
 
 ////////////////////  message callback functions  ////////////////////
 
-// TODO change topic to MotorRPM
-//void InertiaEstimator::rpm_callback(const quadrotor_msgs::MotorRPM::ConstPtr &msg)
-void InertiaEstimator::rpm_callback(const geometry_msgs::WrenchStamped::ConstPtr &msg)
+void InertiaEstimator::rpm_callback(const geom_inertia_estimator::MotorRPM::ConstPtr &msg)
 {
   // read msg
   rpmMsg2input(input_,msg);
@@ -599,7 +597,7 @@ void InertiaEstimator::rpm_callback(const geometry_msgs::WrenchStamped::ConstPtr
   }
 }
 
-void InertiaEstimator::pose_callback(const nav_msgs::Odometry::ConstPtr &msg)
+void InertiaEstimator::pose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg)
 {
   // read msg
   MeasPose meas_pose = poseMsg2measPose(msg);
@@ -662,18 +660,18 @@ void InertiaEstimator::imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
 
 ////////////////////  message conversion functions  ////////////////////
 
-// TODO change message to MotorRPM
-//void InertiaEstimator::rpm_callback(const quadrotor_msgs::MotorRPM::ConstPtr &msg)
-void InertiaEstimator::rpmMsg2input(Input &returnVar, const geometry_msgs::WrenchStamped::ConstPtr &msg)
+// TODO adapt to arbitrary number of rotors
+void InertiaEstimator::rpmMsg2input(Input &returnVar, const geom_inertia_estimator::MotorRPM::ConstPtr &msg)
 {
-  returnVar.rpm_sq << msg->wrench.force.x*msg->wrench.force.x,
-                      msg->wrench.force.y*msg->wrench.force.y,
-                      msg->wrench.force.z*msg->wrench.force.z,
-                      msg->wrench.torque.x*msg->wrench.torque.x;
+  // square rpms so we only need to multiply by the rotor thrust coeff
+  returnVar.rpm_sq << msg->rpm[0]*msg->rpm[0],
+                      msg->rpm[1]*msg->rpm[1],
+                      msg->rpm[2]*msg->rpm[2],
+                      msg->rpm[3]*msg->rpm[3];
   returnVar.t = msg->header.stamp;
 }
 
-MeasPose InertiaEstimator:: poseMsg2measPose(const nav_msgs::Odometry::ConstPtr &msg)
+MeasPose InertiaEstimator:: poseMsg2measPose(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr &msg)
 {
   // TODO allow any rotation
   MeasPose meas_pose;
