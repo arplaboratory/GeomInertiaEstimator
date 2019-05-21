@@ -80,18 +80,23 @@ Firstly, install _PlotJuggler_ if you have not already:
 sudo apt-get install ros-$ROS_DISTRO-plotjuggler
 ```
 
-In a terminal window, start the estimator:
+In a terminal window, start the roscore:
+```
+roscore
+```
+
+In a second terminal window, start the estimator:
 ```
 roslaunch geom_inertia_estimator estimator.launch
 ```
 
-In another terminal window, play the example experiment bag file:
+In a third one, play the example experiment bag file:
 ```
 roscd geom_inertia_estimator/
 rosbag play config/lissajous_trajectory.bag --pause
 ```
 
-You can now plot the estimates using plotjuggler by executing this command in a third window:
+You can now plot the estimates using plotjuggler by executing this command in a fourth window:
 ```
 roscd geom_inertia_estimator/
 rosrun plotjuggler PlotJuggler -l config/PlotJuggler_Layout.xml
