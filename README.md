@@ -102,3 +102,6 @@ roscd geom_inertia_estimator/
 rosrun plotjuggler PlotJuggler -l config/PlotJuggler_Layout.xml
 ```
 When prompted, hit "_Yes (Both Layout and Streaming)_", "_OK_", and "_Create empty placeholders_". You can then unpause the bag play by clicking on the rosbag terminal window and hitting _SPACEBAR_. Now, enjoy following the plots being drawn!
+
+## Remarks
+* If you intend to change the mathematical model of the estimator, please use the Unscented Kalman Filter (UKF) instead of the Extended Kalman Filter (EKF), as we have not yet provided the Matlab functions used to calculate the linearized state transition model.
