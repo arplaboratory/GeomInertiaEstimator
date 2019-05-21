@@ -96,4 +96,4 @@ You can now plot the estimates using plotjuggler by executing this command in a 
 roscd geom_inertia_estimator/
 rosrun plotjuggler PlotJuggler -l config/PlotJuggler_Layout.xml
 ```
-When prompted, hit "_Yes (Both Layout and Streaming)_", "_Create empty placeholders_" and "_OK_". You can then unpause the bag play by hitting _SPACEBAR_. Enjoy following the plots being drawn.
+When prompted, hit "_Yes (Both Layout and Streaming)_", "_OK_", and "_Create empty placeholders_". You can then unpause the bag play by clicking on the rosbag terminal window and hitting _SPACEBAR_. Now, enjoy following the plots being drawn!
