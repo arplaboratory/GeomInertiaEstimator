@@ -65,7 +65,7 @@ catkin_make --pkg geom_inertia_estimator --cmake-args -DCMAKE_BUILD_TYPE=Release
 In case an error message appears, try running the last step again.
 
 ## Usage
-To use the estimator, you first nter the parameters of your multirotor in _config/quad_params.yaml_.
+To use the estimator, first enter the parameters of your multirotor in _config/quad_params.yaml_.
 
 Make sure that the three topics _IMU_, _pose_ and _motor rpm_ are published. 
 
