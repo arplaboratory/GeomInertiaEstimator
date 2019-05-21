@@ -10,8 +10,8 @@
             <rosparam file="$(find geom_inertia_estimator)/config/quad_params.yaml"/>
             <param name="useEKF" value="$(arg use_EKF)"/>
             <remap from="~pose" to="pose"/>
-            <remap from="~imu" to="imu"/>
-            <remap from="~rpm" to="rpm"/>
+            <remap from="~imu"  to="imu"/>
+            <remap from="~rpm"  to="rpm"/>
         </node>
     </group>
 </launch>

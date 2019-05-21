@@ -145,6 +145,10 @@ struct Consts
   Eigen::Matrix<flt,3,4> P_f,P_M;
   int num_rotors;
 
+  // attitude IMU & pose sensor
+  Eigen::Matrix<flt,3,3> R_BI, R_BP;
+  quat q_RB;
+
   // UKF tuning parameters
   flt alpha, kappa, beta;
   flt lambda;
@@ -156,7 +160,7 @@ struct Consts
   flt g;
   // matrices to speed up calculation
   mat3 rotate3;
-  mat6 rotate6;
+  mat6 R_BP_6D;
   mat3 zero3;
   mat3 eye3;
   Eigen::Matrix<flt,NUM_STATES_TANGENT,NUM_STATES_TANGENT> eye_NST;

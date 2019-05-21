@@ -9,7 +9,7 @@ void InertiaEstimator::onInit(const ros::NodeHandle &nh)
   consts_.eye3 = mat3::Identity();
   consts_.eye_NST = Eigen::Matrix<flt,NUM_STATES_TANGENT,NUM_STATES_TANGENT>::Identity();
   consts_.rotate3 = Eigen::DiagonalMatrix<flt,3>(1,-1,-1);
-  consts_.rotate6 << consts_.rotate3, consts_.zero3, consts_.zero3, consts_.rotate3;
+  //consts_.rotate6 << consts_.rotate3, consts_.zero3, consts_.zero3, consts_.rotate3;
   consts_.e_z << 0.0f,0.0f,1.0f;
   consts_.g = 9.807f;
 
@@ -104,9 +104,19 @@ void InertiaEstimator::onInit(const ros::NodeHandle &nh)
   nh.param("UKF/kappa", temp, 0.0);
   consts_.kappa = flt(temp);
 
+  // read attitude of pose sensor and IMU
+  std::vector<flt> R_temp,t_temp;
+  nh.param("R_BP", R_temp, std::vector<flt>(9,1));
+  consts_.R_BP = Eigen::Map<Eigen::Matrix<flt,3,3,Eigen::RowMajor> >(&R_temp[0]);
+  consts_.R_BP_6D << consts_.R_BP, consts_.zero3, consts_.zero3, consts_.R_BP;
+  consts_.q_RB = quat(consts_.R_BP).normalized();
+  nh.param("R_BI", R_temp, std::vector<flt>(9,1));
+  consts_.R_BI = Eigen::Map<Eigen::Matrix<flt,3,3,Eigen::RowMajor> >(&R_temp[0]);
+  Eigen::Matrix<flt,6,6> temp66;
+  temp66 << consts_.R_BI, consts_.zero3, consts_.zero3, consts_.R_BI;
+  consts_.RImu = temp66*consts_.RImu*temp66.transpose();
 
   // calcuate matrices for force & moment calculation for the case where M & B coincide
-  std::vector<flt> R_temp,t_temp;
   mat3 R;
   vec3 t;
   double k_f, k_M;
@@ -660,9 +670,9 @@ void InertiaEstimator::imu_callback(const sensor_msgs::Imu::ConstPtr &msg)
 
 ////////////////////  message conversion functions  ////////////////////
 
-// TODO adapt to arbitrary number of rotors
 void InertiaEstimator::rpmMsg2input(Input &returnVar, const geom_inertia_estimator::MotorRPM::ConstPtr &msg)
 {
+  // TODO adapt to arbitrary number of rotors
   // square rpms so we only need to multiply by the rotor thrust coeff
   returnVar.rpm_sq << msg->rpm[0]*msg->rpm[0],
                       msg->rpm[1]*msg->rpm[1],
@@ -676,19 +686,19 @@ MeasPose InertiaEstimator:: poseMsg2measPose(const geometry_msgs::PoseWithCovari
   // TODO allow any rotation
   MeasPose meas_pose;
   // read position
-  meas_pose.r = vec3(msg->pose.pose.position.x,
-                    -msg->pose.pose.position.y,
-                    -msg->pose.pose.position.z);
+  meas_pose.r = consts_.R_BP*vec3(msg->pose.pose.position.x,
+                                  msg->pose.pose.position.y,
+                                  msg->pose.pose.position.z);
   // read attitude
-  meas_pose.q = quat(msg->pose.pose.orientation.w,
-                     msg->pose.pose.orientation.x,
-                    -msg->pose.pose.orientation.y,
-                    -msg->pose.pose.orientation.z).normalized();
+  meas_pose.q = consts_.q_RB*quat(msg->pose.pose.orientation.w,
+                                  msg->pose.pose.orientation.x,
+                                  msg->pose.pose.orientation.y,
+                                  msg->pose.pose.orientation.z).normalized()*consts_.q_RB.conjugate();
 
   // rotate s.t. z is up instead of down
   mat6 covPose;
   getCovInMsg(msg->pose.covariance,covPose);
-  covPose = consts_.rotate6*covPose*consts_.rotate6;
+  covPose = consts_.R_BP_6D*covPose*consts_.R_BP_6D.transpose();
 
   meas_pose.cov = covPose;
 
@@ -699,13 +709,13 @@ MeasImu InertiaEstimator::imuMsg2measImu(const sensor_msgs::Imu::ConstPtr &msg)
 {
   MeasImu meas_imu;
 
-  meas_imu.a     = vec3(msg->linear_acceleration.x,
-                        -msg->linear_acceleration.y,
-                        -msg->linear_acceleration.z);
+  meas_imu.a     = consts_.R_BI*vec3(msg->linear_acceleration.x,
+                                     msg->linear_acceleration.y,
+                                     msg->linear_acceleration.z);
 
-  meas_imu.Omega = vec3(msg->angular_velocity.x,
-                        -msg->angular_velocity.y,
-                        -msg->angular_velocity.z);
+  meas_imu.Omega = consts_.R_BI*vec3(msg->angular_velocity.x,
+                                     msg->angular_velocity.y,
+                                     msg->angular_velocity.z);
 
   return meas_imu;
 }

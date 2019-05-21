@@ -1,7 +1,9 @@
+# measurement noise IMU in its own frame
 RImu:
     Omega:  {x: 3.0e-2, y: 3.0e-2, z: 3.0e-2}
     a:      {x: 4.84, y: 4.84, z: 4.84}
 
+# process model uncertainty
 Qx: [7.5e-3, 7.5e-3, 7.5e-3,    # q
      1.0e-3, 1.0e-3, 1.0e-3,    # r
      1.0e-2, 1.0e-2, 1.0e-2,    # v
@@ -14,6 +16,7 @@ Qx: [7.5e-3, 7.5e-3, 7.5e-3,    # q
      1.0e-4, 1.0e-4, 1.0e-4,    # b_a
      1.0e-6, 1.0e-6, 1.0e-6]    # b_Omega
 
+# initialization state variables
 x0:
     m:    0.369
     I:    {x: 8.4238e-04, y: 8.4238e-04, z: 8.4238e-04}
@@ -26,6 +29,7 @@ x0:
     # r_BP: {x: 42.42e-3, y: 16.38e-3, z: 0.0e-3}
     # r_BI: {x: 42.42e-3, y: 16.38e-3}
 
+# initialization state covariance
 P0:
     v:       {x: 5.0, y: 5.0, z: 5.0} #{x: 1.0e-2, y: 1.0e-2, z: 1.0e-2} #
     m:       6.0e-2
@@ -36,16 +40,24 @@ P0:
     b_a:     {x: 4.0, y: 4.0, z: 4.0}
     b_Omega: {x: 1.0, y: 1.0, z: 1.0}
 
+# UKF tuning parameters
 UKF:
     alpha: 0.4 
     beta:  2.0
     kappa: 0.0
 
+# attitude pose sensor - 3x3 rotation matrix (row major)
+R_BP: [ 1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0]
+
+# attitude IMU - 3x3 rotation matrix (row major)
+R_BI: [ 1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0]
+
+# rotor properties
 multirotor:
-    rotor1: # only have as many "rotor(i)" as there are on the multirotor
+    rotor1: # have only as many "rotor(i)" as there are on the multirotor
         kf: 4.179e-9 # Unit: [N/rpm^2]
         km: 3.97005e-11 # positive if counter-clockwise, negative if clockwise
-        R: [ 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0] # R (row by row)
+        R: [ 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0] # R (row major)
         t: [ 0.071, 0.08, 0.0]
     rotor2:
         kf: 4.179e-9

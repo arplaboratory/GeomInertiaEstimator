@@ -1,140 +1,98 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <root>
  <tabbed_widget name="Main Window" parent="main_window">
-  <plotmatrix rows="2" tab_name="geometric" columns="1">
+  <plotmatrix columns="1" tab_name="geometric" rows="2">
    <plot row="0" col="0">
-    <range right="24.993200" top="0.057519" left="0.000000" bottom="-0.013619"/>
+    <range bottom="-0.013623" top="0.057492" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="7" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BI/x" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BI/y" B="17" R="255"/>
-    <curve custom_transform="noTransform" G="131" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BI/z" B="17" R="0"/>
+    <curve B="255" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BI/x" custom_transform="noTransform" R="0" G="7"/>
+    <curve B="17" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BI/y" custom_transform="noTransform" R="255" G="0"/>
+    <curve B="17" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BI/z" custom_transform="noTransform" R="0" G="131"/>
     <transform value="noTransform"/>
    </plot>
    <plot row="1" col="0">
-    <range right="24.993200" top="0.044852" left="0.000000" bottom="-0.065227"/>
+    <range bottom="-0.065082" top="0.044979" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BP/x" B="255" R="2"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BP/y" B="0" R="255"/>
-    <curve custom_transform="noTransform" G="150" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BP/z" B="2" R="0"/>
+    <curve B="255" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BP/x" custom_transform="noTransform" R="2" G="0"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BP/y" custom_transform="noTransform" R="255" G="0"/>
+    <curve B="2" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BP/z" custom_transform="noTransform" R="0" G="150"/>
     <transform value="noTransform"/>
    </plot>
   </plotmatrix>
-  <plotmatrix rows="2" tab_name="inertia" columns="2">
+  <plotmatrix columns="1" tab_name="inertia" rows="3">
    <plot row="0" col="0">
-    <range right="24.993200" top="0.030076" left="0.000000" bottom="-0.016610"/>
+    <range bottom="-0.016605" top="0.029880" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BM/x" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BM/y" B="3" R="255"/>
-    <curve custom_transform="noTransform" G="138" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BM/z" B="4" R="0"/>
+    <curve B="255" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BM/x" custom_transform="noTransform" R="0" G="0"/>
+    <curve B="3" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BM/y" custom_transform="noTransform" R="255" G="0"/>
+    <curve B="4" name="/quadrotor/geom_inertia_estimator/param_estimates/r_BM/z" custom_transform="noTransform" R="0" G="138"/>
     <transform value="noTransform"/>
    </plot>
    <plot row="1" col="0">
-    <range right="24.993200" top="0.001161" left="0.000000" bottom="0.000522"/>
+    <range bottom="0.000513" top="0.001161" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/I/x" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/I/y" B="0" R="255"/>
-    <curve custom_transform="noTransform" G="90" name="/quadrotor/geom_inertia_estimator/param_estimates/I/z" B="0" R="3"/>
+    <curve B="255" name="/quadrotor/geom_inertia_estimator/param_estimates/I/x" custom_transform="noTransform" R="0" G="0"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/I/y" custom_transform="noTransform" R="255" G="0"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/I/z" custom_transform="noTransform" R="3" G="90"/>
     <transform value="noTransform"/>
    </plot>
-   <plot row="0" col="1">
-    <range right="24.993200" top="0.441239" left="0.000000" bottom="0.230776"/>
+   <plot row="2" col="0">
+    <range bottom="0.230789" top="0.440534" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/m" B="0" R="0"/>
-    <transform value="noTransform"/>
-   </plot>
-   <plot row="1" col="1">
-    <range right="0.000000" top="1000.000000" left="0.000000" bottom="0.000000"/>
-    <limitY/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/m" custom_transform="noTransform" R="0" G="0"/>
     <transform value="noTransform"/>
    </plot>
   </plotmatrix>
-  <plotmatrix rows="2" tab_name="trajectory" columns="2">
+  <plotmatrix columns="1" tab_name="trajectory" rows="4">
    <plot row="0" col="0">
-    <range right="24.993200" top="1.481425" left="0.000000" bottom="-0.434781"/>
+    <range bottom="-0.434794" top="1.481370" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/r/x" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="3" name="/quadrotor/geom_inertia_estimator/param_estimates/r/y" B="0" R="255"/>
-    <curve custom_transform="noTransform" G="121" name="/quadrotor/geom_inertia_estimator/param_estimates/r/z" B="7" R="0"/>
+    <curve B="255" name="/quadrotor/geom_inertia_estimator/param_estimates/r/x" custom_transform="noTransform" R="0" G="0"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/r/y" custom_transform="noTransform" R="255" G="3"/>
+    <curve B="7" name="/quadrotor/geom_inertia_estimator/param_estimates/r/z" custom_transform="noTransform" R="0" G="121"/>
     <transform value="noTransform"/>
    </plot>
    <plot row="1" col="0">
-    <range right="24.993200" top="1.035622" left="0.000000" bottom="-0.466662"/>
+    <range bottom="-0.466662" top="1.035622" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/q/w" B="0" R="0"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/q/x" B="255" R="5"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/q/y" B="15" R="255"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/q/z" B="0" R="0"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/q/w" custom_transform="noTransform" R="0" G="0"/>
+    <curve B="255" name="/quadrotor/geom_inertia_estimator/param_estimates/q/x" custom_transform="noTransform" R="5" G="0"/>
+    <curve B="15" name="/quadrotor/geom_inertia_estimator/param_estimates/q/y" custom_transform="noTransform" R="255" G="0"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/q/z" custom_transform="noTransform" R="0" G="128"/>
     <transform value="noTransform"/>
    </plot>
-   <plot row="0" col="1">
-    <range right="24.993200" top="1.825801" left="0.000000" bottom="-1.676190"/>
+   <plot row="2" col="0">
+    <range bottom="-1.677202" top="1.822567" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="11" name="/quadrotor/geom_inertia_estimator/param_estimates/v/x" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/v/y" B="20" R="255"/>
-    <curve custom_transform="noTransform" G="137" name="/quadrotor/geom_inertia_estimator/param_estimates/v/z" B="2" R="0"/>
+    <curve B="255" name="/quadrotor/geom_inertia_estimator/param_estimates/v/x" custom_transform="noTransform" R="0" G="16"/>
+    <curve B="19" name="/quadrotor/geom_inertia_estimator/param_estimates/v/y" custom_transform="noTransform" R="255" G="0"/>
+    <curve B="5" name="/quadrotor/geom_inertia_estimator/param_estimates/v/z" custom_transform="noTransform" R="0" G="128"/>
     <transform value="noTransform"/>
    </plot>
-   <plot row="1" col="1">
-    <range right="24.993200" top="7.785002" left="0.000000" bottom="-8.173232"/>
+   <plot row="3" col="0">
+    <range bottom="-8.172533" top="7.710005" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="23" name="/quadrotor/geom_inertia_estimator/param_estimates/Omega/x" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="3" name="/quadrotor/geom_inertia_estimator/param_estimates/Omega/y" B="0" R="255"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/Omega/z" B="3" R="0"/>
+    <curve B="237" name="/quadrotor/geom_inertia_estimator/param_estimates/Omega/x" custom_transform="noTransform" R="0" G="10"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/Omega/y" custom_transform="noTransform" R="255" G="0"/>
+    <curve B="16" name="/quadrotor/geom_inertia_estimator/param_estimates/Omega/z" custom_transform="noTransform" R="0" G="128"/>
     <transform value="noTransform"/>
    </plot>
   </plotmatrix>
-  <plotmatrix rows="2" tab_name="biases" columns="1">
+  <plotmatrix columns="1" tab_name="biases" rows="2">
    <plot row="0" col="0">
-    <range right="24.993200" top="1.529774" left="0.000000" bottom="-0.546600"/>
+    <range bottom="-0.546396" top="1.518767" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/b_a/x" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="13" name="/quadrotor/geom_inertia_estimator/param_estimates/b_a/y" B="0" R="255"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/b_a/z" B="0" R="0"/>
+    <curve B="255" name="/quadrotor/geom_inertia_estimator/param_estimates/b_a/x" custom_transform="noTransform" R="0" G="0"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/b_a/y" custom_transform="noTransform" R="255" G="13"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/b_a/z" custom_transform="noTransform" R="0" G="128"/>
     <transform value="noTransform"/>
    </plot>
    <plot row="1" col="0">
-    <range right="24.993200" top="0.150850" left="0.000000" bottom="-0.175033"/>
+    <range bottom="-0.175482" top="0.150830" left="0.000000" right="24.991925"/>
     <limitY/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/b_Omega/x" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/b_Omega/y" B="7" R="255"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/b_Omega/z" B="0" R="13"/>
-    <transform value="noTransform"/>
-   </plot>
-  </plotmatrix>
-  <plotmatrix rows="1" tab_name="covariances" columns="1">
-   <plot row="0" col="0">
-    <range right="24.993200" top="5.126984" left="0.000000" bottom="-0.125048"/>
-    <limitY/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.0" B="128" R="0"/>
-    <curve custom_transform="noTransform" G="160" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.1" B="164" R="160"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.10" B="0" R="128"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.11" B="0" R="128"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.12" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.13" B="0" R="0"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.14" B="0" R="255"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.15" B="255" R="255"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.16" B="128" R="0"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.17" B="128" R="0"/>
-    <curve custom_transform="noTransform" G="160" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.18" B="164" R="160"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.19" B="0" R="128"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.2" B="0" R="128"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.20" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.21" B="0" R="0"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.22" B="0" R="255"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.23" B="255" R="255"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.24" B="128" R="0"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.25" B="128" R="0"/>
-    <curve custom_transform="noTransform" G="160" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.26" B="164" R="160"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.27" B="0" R="128"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.28" B="0" R="128"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.29" B="255" R="0"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.3" B="0" R="0"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.4" B="0" R="255"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.5" B="255" R="255"/>
-    <curve custom_transform="noTransform" G="0" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.6" B="128" R="0"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.7" B="128" R="0"/>
-    <curve custom_transform="noTransform" G="160" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.8" B="164" R="160"/>
-    <curve custom_transform="noTransform" G="128" name="/quadrotor/geom_inertia_estimator/param_estimates/covariance.9" B="0" R="128"/>
+    <curve B="255" name="/quadrotor/geom_inertia_estimator/param_estimates/b_Omega/x" custom_transform="noTransform" R="0" G="0"/>
+    <curve B="7" name="/quadrotor/geom_inertia_estimator/param_estimates/b_Omega/y" custom_transform="noTransform" R="255" G="0"/>
+    <curve B="0" name="/quadrotor/geom_inertia_estimator/param_estimates/b_Omega/z" custom_transform="noTransform" R="13" G="128"/>
     <transform value="noTransform"/>
    </plot>
   </plotmatrix>
