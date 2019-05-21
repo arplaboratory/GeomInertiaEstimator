@@ -3,7 +3,9 @@ a nonlinear Kalman Filter based ROS package that allows to estimate inertia and 
 
 By combining rotor speed measurements with data from an Inertial Measurement Unit (IMU) and any kind of pose sensor, an Unscented Kalman Filter (UKF) or Extended Kalman Filter (EKF) estimates inertia parameters (mass, moment of inertia, position of center of mass) and geometric parameters (position of IMU, position of pose sensor).
 
-  <img src="https://raw.githubusercontent.com/arplaboratory/GeomInertiaEstimator/master/Multirotor.svg?sanitize=true" width="100%" height="140">
+We facilitate the setup process and demonstrate the performance of the estimator by providing an example bag file containing the data from one of our experiments (_config/lissajous_trajectory.bag_). Furthermore, we provide a layout file (_config/PlotJuggler_Layout.xml_) for [PlotJuggler](http://wiki.ros.org/plotjuggler) to plot and analyse the estimates more easily.
+
+  <img src="https://raw.githubusercontent.com/arplaboratory/GeomInertiaEstimator/master/config/Multirotor.svg?sanitize=true" width="100%" height="140">
   
 <!--video -->
 
@@ -63,7 +65,40 @@ catkin_make --pkg geom_inertia_estimator --cmake-args -DCMAKE_BUILD_TYPE=Release
 In case an error message appears, try running the last step again.
 
 ## Usage
-To launch the estimator package, execute:
+To use the estimator, first enter the parameters of your multirotor in _config/quad_params.yaml_.
+
+Make sure that the three topics _IMU_, _pose_ and _motor rpm_ are published. 
+
+Then, remap these topics in _launch/estimator.launch_ and launch the estimator by executing:
 ```
 roslaunch geom_inertia_estimator estimator.launch
 ```
+
+## Example
+Firstly, install _PlotJuggler_ if you have not already:
+```
+sudo apt-get install ros-$ROS_DISTRO-plotjuggler
+```
+
+In a terminal window, start the roscore:
+```
+roscore
+```
+
+In a second terminal window, start the estimator:
+```
+roslaunch geom_inertia_estimator estimator.launch
+```
+
+In a third one, play the example experiment bag file:
+```
+roscd geom_inertia_estimator/
+rosbag play config/lissajous_trajectory.bag --pause
+```
+
+You can now plot the estimates using plotjuggler by executing this command in a fourth window:
+```
+roscd geom_inertia_estimator/
+rosrun plotjuggler PlotJuggler -l config/PlotJuggler_Layout.xml
+```
+When prompted, hit "_Yes (Both Layout and Streaming)_", "_OK_", and "_Create empty placeholders_". You can then unpause the bag play by clicking on the rosbag terminal window and hitting _SPACEBAR_. Now, enjoy following the plots being drawn!
