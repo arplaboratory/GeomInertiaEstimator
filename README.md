@@ -9,6 +9,8 @@ We facilitate the setup process and demonstrate the performance of the estimator
   
 <!--video -->
 
+NOTE: If you are interested in running this project on a PX4 equipped drone, please check out the fork of [@amengchaoheng](https://github.com/mengchaoheng/GeomInertiaEstimator/commits?author=mengchaoheng), where the code is adapted to run with PX4: [https://github.com/mengchaoheng/GeomInertiaEstimator](https://github.com/mengchaoheng/GeomInertiaEstimator)
+
 ## Reference
 Please cite the following publication in case you are using the package in an academic context:
 
